@@ -10,23 +10,32 @@ ARTIFACT_DIR = "./artifacts"
 def create_skill_pool(conn):
     print("⏳ Extracting Master Skill Pool (The Skeleton)...")
 
-    # 1. Get functional skills
-    skills_df = pd.read_sql_query("SELECT DISTINCT element_name FROM skills WHERE element_name IS NOT NULL", conn)
-    skill_list = skills_df['element_name'].tolist()
+    # 1. Get functional skills WITH their O*NET IDs
+    # We use 'element_id' as the unique key for O*NET math
+    skills_df = pd.read_sql_query(
+        "SELECT DISTINCT element_id as id, element_name as name FROM skills", conn
+    )
 
-    # 2. Get technology tools (using the 'example' column from the Excel file)
-    tech_df = pd.read_sql_query("SELECT DISTINCT example FROM technology_skills WHERE example IS NOT NULL", conn)
-    tech_list = tech_df['example'].tolist()
+    # 2. Get technology tools
+    # Tech skills often use 'commodity_code', but we'll use the name as the ID
+    # for tools since they don't have personality distributions in O*NET.
+    tech_df = pd.read_sql_query(
+        "SELECT DISTINCT example as name FROM technology_skills", conn
+    )
+    tech_df['id'] = "TECH-" + tech_df['name']  # Assign a tech-prefix ID
 
-    # 3. Combine, deduplicate, and sort
-    master_pool = sorted(list(set(skill_list + tech_list)))
+    # 3. Combine into a list of dictionaries
+    skills_list = skills_df.to_dict('records')
+    tech_list = tech_df.to_dict('records')
 
-    # Save to JSON
+    master_pool = skills_list + tech_list
+
+    # Save to JSON as a list of dictionaries
     output_path = os.path.join(ARTIFACT_DIR, "skill_pool.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(master_pool, f, indent=4)
 
-    print(f"   ↳ ✅ Success: Saved {len(master_pool)} unique skills/tools to {output_path}")
+    print(f"   ↳ ✅ Success: Saved {len(master_pool)} identified skills to {output_path}")
 
 
 def create_ocean_benchmarks(conn):
