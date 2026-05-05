@@ -1,0 +1,807 @@
+{
+    "Python": {
+        "original_skill": "Python",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Python",
+        "onet_id": "TECH-Python",
+        "confidence": 1.0
+    },
+    "Java": {
+        "original_skill": "Java",
+        "trendcart_domain": "Programming",
+        "onet_name": "Oracle Java",
+        "onet_id": "TECH-Oracle Java",
+        "confidence": 0.754
+    },
+    "JavaScript": {
+        "original_skill": "JavaScript",
+        "trendcart_domain": "Programming",
+        "onet_name": "JavaScript",
+        "onet_id": "TECH-JavaScript",
+        "confidence": 1.0
+    },
+    "C++": {
+        "original_skill": "C++",
+        "trendcart_domain": "Programming",
+        "onet_name": "C++",
+        "onet_id": "TECH-C++",
+        "confidence": 1.0
+    },
+    "C#": {
+        "original_skill": "C#",
+        "trendcart_domain": "Programming",
+        "onet_name": "C#",
+        "onet_id": "TECH-C#",
+        "confidence": 1.0
+    },
+    "Ruby": {
+        "original_skill": "Ruby",
+        "trendcart_domain": "Programming",
+        "onet_name": "Ruby",
+        "onet_id": "TECH-Ruby",
+        "confidence": 1.0
+    },
+    "PHP": {
+        "original_skill": "PHP",
+        "trendcart_domain": "Programming",
+        "onet_name": "PHP",
+        "onet_id": "TECH-PHP",
+        "confidence": 1.0
+    },
+    "Go": {
+        "original_skill": "Go",
+        "trendcart_domain": "Programming",
+        "onet_name": "Go",
+        "onet_id": "TECH-Go",
+        "confidence": 1.0
+    },
+    "Rust": {
+        "original_skill": "Rust",
+        "trendcart_domain": "Programming",
+        "onet_name": "Rust programming language",
+        "onet_id": "TECH-Rust programming language",
+        "confidence": 0.659
+    },
+    "TypeScript": {
+        "original_skill": "TypeScript",
+        "trendcart_domain": "Programming",
+        "onet_name": "TypeScript",
+        "onet_id": "TECH-TypeScript",
+        "confidence": 1.0
+    },
+    "Kotlin": {
+        "original_skill": "Kotlin",
+        "trendcart_domain": "Programming",
+        "onet_name": "Kotlin",
+        "onet_id": "TECH-Kotlin",
+        "confidence": 1.0
+    },
+    "Swift": {
+        "original_skill": "Swift",
+        "trendcart_domain": "Programming",
+        "onet_name": "Swift",
+        "onet_id": "TECH-Swift",
+        "confidence": 1.0
+    },
+    "Scala": {
+        "original_skill": "Scala",
+        "trendcart_domain": "Programming",
+        "onet_name": "Scala",
+        "onet_id": "TECH-Scala",
+        "confidence": 1.0
+    },
+    "Perl": {
+        "original_skill": "Perl",
+        "trendcart_domain": "Programming",
+        "onet_name": "Perl",
+        "onet_id": "TECH-Perl",
+        "confidence": 1.0
+    },
+    "Shell Scripting": {
+        "original_skill": "Shell Scripting",
+        "trendcart_domain": "Programming",
+        "onet_name": "Shell script",
+        "onet_id": "TECH-Shell script",
+        "confidence": 0.939
+    },
+    "R": {
+        "original_skill": "R",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "R",
+        "onet_id": "TECH-R",
+        "confidence": 1.0
+    },
+    "HTML": {
+        "original_skill": "HTML",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Hypertext markup language HTML",
+        "onet_id": "TECH-Hypertext markup language HTML",
+        "confidence": 0.672
+    },
+    "CSS": {
+        "original_skill": "CSS",
+        "trendcart_domain": "Web Development",
+        "onet_name": "CSS CLS-2000",
+        "onet_id": "TECH-CSS CLS-2000",
+        "confidence": 0.711
+    },
+    "React": {
+        "original_skill": "React",
+        "trendcart_domain": "Web Development",
+        "onet_name": "React",
+        "onet_id": "TECH-React",
+        "confidence": 1.0
+    },
+    "Vue.js": {
+        "original_skill": "Vue.js",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Vue.js",
+        "onet_id": "TECH-Vue.js",
+        "confidence": 1.0
+    },
+    "Angular": {
+        "original_skill": "Angular",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Google Angular",
+        "onet_id": "TECH-Google Angular",
+        "confidence": 0.884
+    },
+    "Node.js": {
+        "original_skill": "Node.js",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Node.js",
+        "onet_id": "TECH-Node.js",
+        "confidence": 1.0
+    },
+    "Django": {
+        "original_skill": "Django",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Django",
+        "onet_id": "TECH-Django",
+        "confidence": 1.0
+    },
+    "Flask": {
+        "original_skill": "Flask",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Flask",
+        "onet_id": "TECH-Flask",
+        "confidence": 1.0
+    },
+    "REST API": {
+        "original_skill": "REST API",
+        "trendcart_domain": "Web Development",
+        "onet_name": "RESTful API",
+        "onet_id": "TECH-RESTful API",
+        "confidence": 0.915
+    },
+    "GraphQL": {
+        "original_skill": "GraphQL",
+        "trendcart_domain": "Web Development",
+        "onet_name": "GraphQL",
+        "onet_id": "TECH-GraphQL",
+        "confidence": 1.0
+    },
+    "Responsive Design": {
+        "original_skill": "Responsive Design",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Web Accessibility": {
+        "original_skill": "Web Accessibility",
+        "trendcart_domain": "Web Development",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "SEO": {
+        "original_skill": "SEO",
+        "trendcart_domain": "Web Development",
+        "onet_name": "seoClarity",
+        "onet_id": "TECH-seoClarity",
+        "confidence": 0.772
+    },
+    "Android": {
+        "original_skill": "Android",
+        "trendcart_domain": "Mobile Development",
+        "onet_name": "Google Android",
+        "onet_id": "TECH-Google Android",
+        "confidence": 0.88
+    },
+    "iOS": {
+        "original_skill": "iOS",
+        "trendcart_domain": "Mobile Development",
+        "onet_name": "Apple iOS",
+        "onet_id": "TECH-Apple iOS",
+        "confidence": 0.94
+    },
+    "React Native": {
+        "original_skill": "React Native",
+        "trendcart_domain": "Mobile Development",
+        "onet_name": "React Native",
+        "onet_id": "TECH-React Native",
+        "confidence": 1.0
+    },
+    "Flutter": {
+        "original_skill": "Flutter",
+        "trendcart_domain": "Mobile Development",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Mobile UI/UX": {
+        "original_skill": "Mobile UI/UX",
+        "trendcart_domain": "Mobile Development",
+        "onet_name": "Mobile application software",
+        "onet_id": "TECH-Mobile application software",
+        "confidence": 0.651
+    },
+    "Mobile Security": {
+        "original_skill": "Mobile Security",
+        "trendcart_domain": "Mobile Development",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "App Testing": {
+        "original_skill": "App Testing",
+        "trendcart_domain": "Mobile Development",
+        "onet_name": "Testing software",
+        "onet_id": "TECH-Testing software",
+        "confidence": 0.747
+    },
+    "AWS": {
+        "original_skill": "AWS",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Amazon Web Services AWS software",
+        "onet_id": "TECH-Amazon Web Services AWS software",
+        "confidence": 0.673
+    },
+    "Azure": {
+        "original_skill": "Azure",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Microsoft Azure software",
+        "onet_id": "TECH-Microsoft Azure software",
+        "confidence": 0.823
+    },
+    "GCP": {
+        "original_skill": "GCP",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Docker": {
+        "original_skill": "Docker",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Docker",
+        "onet_id": "TECH-Docker",
+        "confidence": 1.0
+    },
+    "Kubernetes": {
+        "original_skill": "Kubernetes",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Kubernetes",
+        "onet_id": "TECH-Kubernetes",
+        "confidence": 1.0
+    },
+    "CI/CD": {
+        "original_skill": "CI/CD",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Jenkins": {
+        "original_skill": "Jenkins",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Jenkins CI",
+        "onet_id": "TECH-Jenkins CI",
+        "confidence": 0.907
+    },
+    "Terraform": {
+        "original_skill": "Terraform",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "TERRASCIENCES TerraStation",
+        "onet_id": "TECH-TERRASCIENCES TerraStation",
+        "confidence": 0.801
+    },
+    "CloudFormation": {
+        "original_skill": "CloudFormation",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Amazon Web Services AWS CloudFormation",
+        "onet_id": "TECH-Amazon Web Services AWS CloudFormation",
+        "confidence": 0.734
+    },
+    "Ansible": {
+        "original_skill": "Ansible",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Ansible software",
+        "onet_id": "TECH-Ansible software",
+        "confidence": 0.948
+    },
+    "Microservices": {
+        "original_skill": "Microservices",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Microservices Architecture",
+        "onet_id": "TECH-Microservices Architecture",
+        "confidence": 0.894
+    },
+    "Serverless": {
+        "original_skill": "Serverless",
+        "trendcart_domain": "Cloud & DevOps",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Machine Learning": {
+        "original_skill": "Machine Learning",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Deep Learning": {
+        "original_skill": "Deep Learning",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "TensorFlow": {
+        "original_skill": "TensorFlow",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "TensorFlow",
+        "onet_id": "TECH-TensorFlow",
+        "confidence": 1.0
+    },
+    "PyTorch": {
+        "original_skill": "PyTorch",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "PyTorch",
+        "onet_id": "TECH-PyTorch",
+        "confidence": 1.0
+    },
+    "Scikit-learn": {
+        "original_skill": "Scikit-learn",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Scikit-learn",
+        "onet_id": "TECH-Scikit-learn",
+        "confidence": 1.0
+    },
+    "Data Analysis": {
+        "original_skill": "Data Analysis",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Data analysis software",
+        "onet_id": "TECH-Data analysis software",
+        "confidence": 0.652
+    },
+    "Statistics": {
+        "original_skill": "Statistics",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "STATISTICA",
+        "onet_id": "TECH-STATISTICA",
+        "confidence": 0.783
+    },
+    "Pandas": {
+        "original_skill": "Pandas",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "pandas",
+        "onet_id": "TECH-pandas",
+        "confidence": 1.0
+    },
+    "NumPy": {
+        "original_skill": "NumPy",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "NumPy",
+        "onet_id": "TECH-NumPy",
+        "confidence": 1.0
+    },
+    "SQL": {
+        "original_skill": "SQL",
+        "trendcart_domain": "Database",
+        "onet_name": "Windent SQL",
+        "onet_id": "TECH-Windent SQL",
+        "confidence": 0.694
+    },
+    "Tableau": {
+        "original_skill": "Tableau",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Tableau",
+        "onet_id": "TECH-Tableau",
+        "confidence": 1.0
+    },
+    "Power BI": {
+        "original_skill": "Power BI",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Microsoft Power BI",
+        "onet_id": "TECH-Microsoft Power BI",
+        "confidence": 0.835
+    },
+    "Jupyter": {
+        "original_skill": "Jupyter",
+        "trendcart_domain": "Data Science & Analytics",
+        "onet_name": "Jupyter software",
+        "onet_id": "TECH-Jupyter software",
+        "confidence": 0.772
+    },
+    "MySQL": {
+        "original_skill": "MySQL",
+        "trendcart_domain": "Database",
+        "onet_name": "MySQL",
+        "onet_id": "TECH-MySQL",
+        "confidence": 1.0
+    },
+    "PostgreSQL": {
+        "original_skill": "PostgreSQL",
+        "trendcart_domain": "Database",
+        "onet_name": "PostgreSQL",
+        "onet_id": "TECH-PostgreSQL",
+        "confidence": 1.0
+    },
+    "MongoDB": {
+        "original_skill": "MongoDB",
+        "trendcart_domain": "Database",
+        "onet_name": "MongoDB",
+        "onet_id": "TECH-MongoDB",
+        "confidence": 1.0
+    },
+    "Oracle": {
+        "original_skill": "Oracle",
+        "trendcart_domain": "Database",
+        "onet_name": "Oracle software",
+        "onet_id": "TECH-Oracle software",
+        "confidence": 0.872
+    },
+    "Cassandra": {
+        "original_skill": "Cassandra",
+        "trendcart_domain": "Database",
+        "onet_name": "Apache Cassandra",
+        "onet_id": "TECH-Apache Cassandra",
+        "confidence": 0.797
+    },
+    "Redis": {
+        "original_skill": "Redis",
+        "trendcart_domain": "Database",
+        "onet_name": "Redis",
+        "onet_id": "TECH-Redis",
+        "confidence": 1.0
+    },
+    "Database Design": {
+        "original_skill": "Database Design",
+        "trendcart_domain": "Database",
+        "onet_name": "Database design software",
+        "onet_id": "TECH-Database design software",
+        "confidence": 0.783
+    },
+    "Query Optimization": {
+        "original_skill": "Query Optimization",
+        "trendcart_domain": "Database",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "NoSQL": {
+        "original_skill": "NoSQL",
+        "trendcart_domain": "Database",
+        "onet_name": "NoSQL",
+        "onet_id": "TECH-NoSQL",
+        "confidence": 1.0
+    },
+    "Leadership": {
+        "original_skill": "Leadership",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Communication": {
+        "original_skill": "Communication",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Problem Solving": {
+        "original_skill": "Problem Solving",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Complex Problem Solving",
+        "onet_id": "2.B.2.i",
+        "confidence": 0.778
+    },
+    "Critical Thinking": {
+        "original_skill": "Critical Thinking",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Critical Thinking",
+        "onet_id": "2.A.2.a",
+        "confidence": 1.0
+    },
+    "Teamwork": {
+        "original_skill": "Teamwork",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Time Management": {
+        "original_skill": "Time Management",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Time Management",
+        "onet_id": "2.B.5.a",
+        "confidence": 1.0
+    },
+    "Adaptability": {
+        "original_skill": "Adaptability",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Adapt It",
+        "onet_id": "TECH-Adapt It",
+        "confidence": 0.627
+    },
+    "Creativity": {
+        "original_skill": "Creativity",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Negotiation": {
+        "original_skill": "Negotiation",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Negotiation",
+        "onet_id": "2.B.1.d",
+        "confidence": 1.0
+    },
+    "Mentoring": {
+        "original_skill": "Mentoring",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Project Management": {
+        "original_skill": "Project Management",
+        "trendcart_domain": "Professional",
+        "onet_name": "Project management software",
+        "onet_id": "TECH-Project management software",
+        "confidence": 0.86
+    },
+    "Strategic Planning": {
+        "original_skill": "Strategic Planning",
+        "trendcart_domain": "Business",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Decision Making": {
+        "original_skill": "Decision Making",
+        "trendcart_domain": "Soft Skills",
+        "onet_name": "Judgment and Decision Making",
+        "onet_id": "2.B.4.e",
+        "confidence": 0.727
+    },
+    "Financial Analysis": {
+        "original_skill": "Financial Analysis",
+        "trendcart_domain": "Business",
+        "onet_name": "Financial analysis software",
+        "onet_id": "TECH-Financial analysis software",
+        "confidence": 0.744
+    },
+    "Business Development": {
+        "original_skill": "Business Development",
+        "trendcart_domain": "Business",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Market Research": {
+        "original_skill": "Market Research",
+        "trendcart_domain": "Business",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Business Acumen": {
+        "original_skill": "Business Acumen",
+        "trendcart_domain": "Business",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Sales": {
+        "original_skill": "Sales",
+        "trendcart_domain": "Business",
+        "onet_name": "Sales software",
+        "onet_id": "TECH-Sales software",
+        "confidence": 0.725
+    },
+    "Marketing": {
+        "original_skill": "Marketing",
+        "trendcart_domain": "Business",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Budget Management": {
+        "original_skill": "Budget Management",
+        "trendcart_domain": "Business",
+        "onet_name": "Budgeting software",
+        "onet_id": "TECH-Budgeting software",
+        "confidence": 0.785
+    },
+    "P&L Management": {
+        "original_skill": "P&L Management",
+        "trendcart_domain": "Business",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "User Experience": {
+        "original_skill": "User Experience",
+        "trendcart_domain": "Design",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "User Interface": {
+        "original_skill": "User Interface",
+        "trendcart_domain": "Design",
+        "onet_name": "User interface design software",
+        "onet_id": "TECH-User interface design software",
+        "confidence": 0.824
+    },
+    "Graphic Design": {
+        "original_skill": "Graphic Design",
+        "trendcart_domain": "Design",
+        "onet_name": "Graphics software",
+        "onet_id": "TECH-Graphics software",
+        "confidence": 0.7
+    },
+    "Web Design": {
+        "original_skill": "Web Design",
+        "trendcart_domain": "Design",
+        "onet_name": "Web design software",
+        "onet_id": "TECH-Web design software",
+        "confidence": 0.841
+    },
+    "Adobe Creative Suite": {
+        "original_skill": "Adobe Creative Suite",
+        "trendcart_domain": "Design",
+        "onet_name": "Adobe Creative Cloud software",
+        "onet_id": "TECH-Adobe Creative Cloud software",
+        "confidence": 0.824
+    },
+    "Figma": {
+        "original_skill": "Figma",
+        "trendcart_domain": "Design",
+        "onet_name": "Figma",
+        "onet_id": "TECH-Figma",
+        "confidence": 1.0
+    },
+    "Wireframing": {
+        "original_skill": "Wireframing",
+        "trendcart_domain": "Design",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Prototyping": {
+        "original_skill": "Prototyping",
+        "trendcart_domain": "Design",
+        "onet_name": "Rapid prototyping software",
+        "onet_id": "TECH-Rapid prototyping software",
+        "confidence": 0.838
+    },
+    "Penetration Testing": {
+        "original_skill": "Penetration Testing",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Penetration testing software",
+        "onet_id": "TECH-Penetration testing software",
+        "confidence": 0.858
+    },
+    "Network Security": {
+        "original_skill": "Network Security",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Encryption": {
+        "original_skill": "Encryption",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Encryption software",
+        "onet_id": "TECH-Encryption software",
+        "confidence": 0.824
+    },
+    "Firewalls": {
+        "original_skill": "Firewalls",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Firewall software",
+        "onet_id": "TECH-Firewall software",
+        "confidence": 0.811
+    },
+    "Security Protocols": {
+        "original_skill": "Security Protocols",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Risk Assessment": {
+        "original_skill": "Risk Assessment",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Risk assessment software",
+        "onet_id": "TECH-Risk assessment software",
+        "confidence": 0.755
+    },
+    "Compliance": {
+        "original_skill": "Compliance",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Compliance 360",
+        "onet_id": "TECH-Compliance 360",
+        "confidence": 0.815
+    },
+    "Security Architecture": {
+        "original_skill": "Security Architecture",
+        "trendcart_domain": "Cybersecurity",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Agile": {
+        "original_skill": "Agile",
+        "trendcart_domain": "Professional",
+        "onet_name": "Endeavour Agile ALM",
+        "onet_id": "TECH-Endeavour Agile ALM",
+        "confidence": 0.718
+    },
+    "Scrum": {
+        "original_skill": "Scrum",
+        "trendcart_domain": "Professional",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    },
+    "Kanban": {
+        "original_skill": "Kanban",
+        "trendcart_domain": "Professional",
+        "onet_name": "PMC KanbanSIM",
+        "onet_id": "TECH-PMC KanbanSIM",
+        "confidence": 0.694
+    },
+    "Jira": {
+        "original_skill": "Jira",
+        "trendcart_domain": "Professional",
+        "onet_name": "Atlassian JIRA",
+        "onet_id": "TECH-Atlassian JIRA",
+        "confidence": 0.795
+    },
+    "Confluence": {
+        "original_skill": "Confluence",
+        "trendcart_domain": "Professional",
+        "onet_name": "Atlassian Confluence",
+        "onet_id": "TECH-Atlassian Confluence",
+        "confidence": 0.826
+    },
+    "Documentation": {
+        "original_skill": "Documentation",
+        "trendcart_domain": "Professional",
+        "onet_name": "Maintenance documentation software",
+        "onet_id": "TECH-Maintenance documentation software",
+        "confidence": 0.677
+    },
+    "Technical Writing": {
+        "original_skill": "Technical Writing",
+        "trendcart_domain": "Professional",
+        "onet_name": "Writing",
+        "onet_id": "2.A.1.c",
+        "confidence": 0.689
+    },
+    "Presentation Skills": {
+        "original_skill": "Presentation Skills",
+        "trendcart_domain": "Professional",
+        "onet_name": "Unmapped",
+        "onet_id": "Unmapped",
+        "confidence": 0.0
+    }
+}

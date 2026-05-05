@@ -4,8 +4,13 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
-# Load environment variables from the .env file in the root directory
-load_dotenv()
+# Dynamic pathing to ensure .env and artifacts are always found
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# src/agents/ir/ -> src/agents/ -> src/ -> project_root/ (3 levels up)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(SCRIPT_DIR)))
+
+# Load .env using absolute path
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 
 class IRExtractor:
@@ -23,12 +28,12 @@ class IRExtractor:
     def _build_system_prompt(self) -> str:
         """Loads the text prompt and injects the 41 work activities."""
         # 1. Load the text file (Path is relative to where this script lives)
-        prompt_path = "./src/agents/ir/extractor_prompt.txt"
+        prompt_path = os.path.join(SCRIPT_DIR, "extractor_prompt.txt")
         with open(prompt_path, "r", encoding="utf-8") as f:
             template = f.read()
 
         # 2. Load the Work Activities JSON using the .env path
-        artifact_dir = os.getenv("ARTIFACT_DIR")
+        artifact_dir = os.path.join(PROJECT_ROOT, os.getenv("ARTIFACT_DIR", "data/artifacts"))
         if not artifact_dir:
             raise ValueError("ARTIFACT_DIR environment variable is not set. Check your .env file.")
 
