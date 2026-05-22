@@ -44,11 +44,20 @@ def generate_augmented_dataset():
 
             # 2. Augment Personality Scores (Add Gaussian Noise)
             noisy_ocean = {}
-            for trait in ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"]:
-                mu = base_ocean.get(trait, 50.0)
+
+            trait_map = {
+                "openness": "O",
+                "conscientiousness": "C",
+                "extraversion": "E",
+                "agreeableness": "A",
+                "neuroticism": "N"
+            }
+
+            for full_name, short_key in trait_map.items():
+                mu = base_ocean.get(short_key, 50.0)
                 noisy_score = random.gauss(mu, NOISE_STD_DEV)
                 noisy_score = max(0.0, min(100.0, noisy_score))
-                noisy_ocean[trait] = round(noisy_score, 2)
+                noisy_ocean[full_name] = round(noisy_score, 2)
 
             synthetic_candidate["ocean_vector"] = noisy_ocean
             training_dataset.append(synthetic_candidate)
