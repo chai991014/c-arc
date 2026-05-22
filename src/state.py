@@ -1,28 +1,47 @@
-from typing import Annotated, TypedDict, List, Dict, Optional
-from langchain_core.messages import BaseMessage
+from typing import TypedDict, List, Dict, Annotated
 from langgraph.graph.message import add_messages
+from langchain_core.messages import AnyMessage
+
+
+class OceanVector(TypedDict):
+    """The Big Five personality dimensions updated via Exponential Moving Average."""
+    openness: float
+    conscientiousness: float
+    extraversion: float
+    agreeableness: float
+    neuroticism: float
 
 
 class MasterProfile(TypedDict):
-    """The hard-fact professional data grounded in O*NET."""
-    skills: List[Dict[str, str]]  # List of {"id": "1.A.1", "name": "Python"}
-    work_activities: List[Dict[str, str]]  # List of {"id": "4.A.1", "name": "Analyzing Data"}
-    role_history: List[Dict]  # Experience details
-    education: Optional[str]
-    verification_status: bool  # True if user confirmed "Digital Twin"
+    """The candidate's grounded professional trajectory."""
+    skills: List[str]  # Array of verified O*NET skill/DWA IDs
+    experience: List[Dict[str, str]]  # Array of past roles and descriptions
+    education: List[Dict[str, str]]  # Educational background
+
+
+class GateStatus(TypedDict):
+    """Tracks the Evaluator Agent's Triple-Gate Logic."""
+    trait_variance_cleared: bool
+    density_audit_cleared: bool
+    stability_cleared: bool
 
 
 class CArcState(TypedDict):
-    """The central state for the C-Arc Multi-Agent System."""
-    # Annotated with add_messages so LangGraph appends chat history automatically
-    messages: Annotated[List[BaseMessage], add_messages]
+    """
+    The central state machine (Nervous System) for the C-Arc multi-agent framework.
+    Passed between Mentor, Profiler, IR, and Evaluator agents.
+    """
 
-    # Psychometric Data [0-100 scalar]
-    ocean_vector: Dict[str, float]  # {"O": 0.0, "C": 0.0, "E": 0.0, "A": 0.0, "N": 0.0}
+    # 1. Message History
+    # The `add_messages` reducer ensures new dialogue is appended, not overwritten.
+    messages: Annotated[list[AnyMessage], add_messages]
 
-    # Grounded Professional Data
+    # 2. Candidate Profiles
     master_profile: MasterProfile
+    ocean_vector: OceanVector
 
-    # Logic Controller signals
-    state_signal: str  # e.g., "DISCOVERY", "VALIDATION", "MATCHING"
-    next_topic: Optional[str]  # Signal from Evaluator (e.g., "FORCE_TOPIC [SKILL]")
+    # 3. System Routing & Control Signals
+    current_mode: str  # Defines the active agent phase (e.g., "interview", "evaluation", "synthesis")
+    gate_status: GateStatus  # Tracks if the interview can conclude
+    turn_count: int  # Tracks conversation length for stability dampening math
+    force_topic: str  # Signal for the Mentor to shift the conversation focus
