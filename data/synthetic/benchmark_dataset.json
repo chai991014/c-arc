@@ -140,11 +140,11 @@
             "4.A.2.b.2.I20.D03"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 81.56,
+            "C": 84.76,
+            "E": 84.15,
+            "A": 51.61,
+            "N": 9.17
         }
     },
     {
@@ -1211,11 +1211,11 @@
             "4.A.1.a.2.I02.D17"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 61.19,
+            "C": 81.75,
+            "E": 69.85,
+            "A": 54.39,
+            "N": 25.61
         }
     },
     {
@@ -1256,11 +1256,11 @@
             "4.A.4.b.4.I12.D25"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 61.19,
+            "C": 81.75,
+            "E": 69.85,
+            "A": 54.39,
+            "N": 25.61
         }
     },
     {
@@ -1319,11 +1319,11 @@
             "4.A.3.a.1.I11.D10"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 61.19,
+            "C": 81.75,
+            "E": 69.85,
+            "A": 54.39,
+            "N": 25.61
         }
     },
     {
@@ -1374,11 +1374,11 @@
             "4.A.4.b.4.I12.D25"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 61.19,
+            "C": 81.75,
+            "E": 69.85,
+            "A": 54.39,
+            "N": 25.61
         }
     },
     {
@@ -2211,11 +2211,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -2327,11 +2327,11 @@
             "4.A.1.b.2.I02.D01"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 78.37,
+            "C": 81.75,
+            "E": 72.22,
+            "A": 55.67,
+            "N": 25.5
         }
     },
     {
@@ -2867,11 +2867,11 @@
             "4.A.2.a.1.I05.D03"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 85.93,
+            "C": 81.49,
+            "E": 71.85,
+            "A": 56.83,
+            "N": 24.61
         }
     },
     {
@@ -3190,11 +3190,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -3328,11 +3328,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -3491,11 +3491,11 @@
             "4.A.4.b.4.I12.D34"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -3613,11 +3613,11 @@
             "4.A.4.b.4.I12.D25"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -3659,11 +3659,11 @@
             "4.A.2.b.2.I20.D01"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -3727,11 +3727,11 @@
             "4.A.3.b.6.I07.D04"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -4174,11 +4174,11 @@
             "4.A.2.a.4.I07.D01"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 38.67,
+            "C": 76.29,
+            "E": 51.48,
+            "A": 55.28,
+            "N": 39.0
         }
     },
     {
@@ -4228,11 +4228,11 @@
             "4.A.1.a.2.I11.D07"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 38.67,
+            "C": 76.29,
+            "E": 51.48,
+            "A": 55.28,
+            "N": 39.0
         }
     },
     {
@@ -5418,11 +5418,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -5525,11 +5525,11 @@
             "4.A.2.b.2.I20.D02"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -6507,11 +6507,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -7842,11 +7842,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -8909,11 +8909,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -9657,11 +9657,11 @@
             "4.A.2.a.1.I07.D07"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 73.78,
+            "C": 81.78,
+            "E": 59.11,
+            "A": 50.28,
+            "N": 31.33
         }
     },
     {
@@ -10929,11 +10929,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -11394,11 +11394,11 @@
             "4.A.2.a.1.I07.D04"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -11437,11 +11437,11 @@
             "4.A.1.a.1.I06.D04"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -11653,11 +11653,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -12388,11 +12388,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -12902,11 +12902,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -13541,11 +13541,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -13900,11 +13900,11 @@
             "4.A.2.a.4.I07.D05"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 77.78,
+            "C": 80.76,
+            "E": 57.85,
+            "A": 58.17,
+            "N": 33.11
         }
     },
     {
@@ -13965,11 +13965,11 @@
             "4.A.3.b.6.I07.D04"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 77.78,
+            "C": 80.76,
+            "E": 57.85,
+            "A": 58.17,
+            "N": 33.11
         }
     },
     {
@@ -14062,11 +14062,11 @@
             "4.A.2.b.2.I16.D02"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 77.78,
+            "C": 80.76,
+            "E": 57.85,
+            "A": 58.17,
+            "N": 33.11
         }
     },
     {
@@ -14238,11 +14238,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -14413,11 +14413,11 @@
             "4.A.4.b.3.I02.D03"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 83.56,
+            "C": 77.27,
+            "E": 48.52,
+            "A": 41.78,
+            "N": 35.11
         }
     },
     {
@@ -14684,11 +14684,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -15144,11 +15144,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -16004,11 +16004,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -16642,11 +16642,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -16826,11 +16826,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -17085,11 +17085,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -17222,11 +17222,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -17631,11 +17631,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -19040,11 +19040,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -20204,11 +20204,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -21349,11 +21349,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -21709,11 +21709,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -22400,11 +22400,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -22413,11 +22413,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -22648,11 +22648,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -23075,11 +23075,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -23844,11 +23844,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -24361,11 +24361,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -24815,11 +24815,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -25055,11 +25055,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -25900,11 +25900,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -27505,11 +27505,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -28007,11 +28007,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -28123,11 +28123,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -29718,11 +29718,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -30181,11 +30181,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -31287,11 +31287,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -31675,11 +31675,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -32925,11 +32925,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -33383,11 +33383,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -33956,11 +33956,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -34238,11 +34238,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -34476,11 +34476,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -34908,11 +34908,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -35215,11 +35215,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -36343,11 +36343,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -37191,11 +37191,11 @@
             "4.A.4.a.6.I03.D02"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 68.0,
+            "C": 77.05,
+            "E": 77.56,
+            "A": 47.89,
+            "N": 25.22
         }
     },
     {
@@ -37654,11 +37654,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -37845,11 +37845,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -38308,11 +38308,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -39216,11 +39216,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -40606,11 +40606,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -41016,11 +41016,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -41287,11 +41287,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -41384,11 +41384,11 @@
             "4.A.4.c.3.I05.D05"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 53.11,
+            "C": 79.87,
+            "E": 74.59,
+            "A": 60.0,
+            "N": 25.5
         }
     },
     {
@@ -42884,11 +42884,11 @@
             "4.A.4.a.1.I02.D06"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 39.41,
+            "C": 71.43,
+            "E": 39.19,
+            "A": 41.78,
+            "N": 42.39
         }
     },
     {
@@ -43562,11 +43562,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -43681,11 +43681,11 @@
             "4.A.2.a.2.I05.D03"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 42.89,
+            "C": 81.27,
+            "E": 53.19,
+            "A": 50.33,
+            "N": 35.0
         }
     },
     {
@@ -44113,11 +44113,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -44173,11 +44173,11 @@
             "4.A.1.b.2.I07.D18"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -44720,11 +44720,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -44858,11 +44858,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -47419,11 +47419,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -47918,11 +47918,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -47988,11 +47988,11 @@
             "4.A.3.a.2.I35.D05"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -48530,11 +48530,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -48920,11 +48920,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -50401,11 +50401,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -51486,11 +51486,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -51869,11 +51869,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -52109,11 +52109,11 @@
             "4.A.3.a.3.I03.D02"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 32.67,
+            "C": 77.14,
+            "E": 32.44,
+            "A": 39.83,
+            "N": 29.17
         }
     },
     {
@@ -52172,11 +52172,11 @@
             "4.A.3.a.2.I34.D08"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 32.67,
+            "C": 77.14,
+            "E": 32.44,
+            "A": 39.83,
+            "N": 29.17
         }
     },
     {
@@ -52474,11 +52474,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -52536,11 +52536,11 @@
             "4.A.3.b.4.I06.D01"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -54604,11 +54604,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -54758,11 +54758,11 @@
             "4.A.1.a.1.I02.D03"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 47.26,
+            "C": 73.59,
+            "E": 77.41,
+            "A": 61.61,
+            "N": 28.11
         }
     },
     {
@@ -54893,11 +54893,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -55660,11 +55660,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -55946,11 +55946,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -56660,11 +56660,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57026,11 +57026,11 @@
             "4.A.3.b.4.I06.D04"
         ],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": 24.89,
+            "C": 54.35,
+            "E": 33.11,
+            "A": 38.39,
+            "N": 57.39
         }
     },
     {
@@ -57445,11 +57445,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57458,11 +57458,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57471,11 +57471,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57484,11 +57484,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57497,11 +57497,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57510,11 +57510,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57523,11 +57523,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57536,11 +57536,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57549,11 +57549,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57562,11 +57562,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57575,11 +57575,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57588,11 +57588,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57601,11 +57601,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57614,11 +57614,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57627,11 +57627,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57640,11 +57640,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57653,11 +57653,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57666,11 +57666,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57679,11 +57679,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     },
     {
@@ -57692,11 +57692,11 @@
         "perfect_tasks": [],
         "perfect_dwas": [],
         "base_ocean": {
-            "openness": 50.0,
-            "conscientiousness": 50.0,
-            "extraversion": 50.0,
-            "agreeableness": 50.0,
-            "neuroticism": 50.0
+            "O": null,
+            "C": null,
+            "E": null,
+            "A": null,
+            "N": null
         }
     }
 ]

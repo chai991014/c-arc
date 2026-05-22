@@ -1,10 +1,12 @@
 import sqlite3
 import json
 import os
+import csv
 
 DB_PATH = "../data/onet.db"
 BENCHMARKS_PATH = "../data/artifacts/soc_ocean_benchmarks.json"
-OUTPUT_PATH = "../data/synthetic/benchmark_dataset.json"
+OUTPUT_JSON_PATH = "../data/synthetic/benchmark_dataset.json"
+OUTPUT_CSV_PATH = "../data/synthetic/benchmark_dataset.csv"
 
 
 def fetch_occupations(cursor):
@@ -42,10 +44,18 @@ def build_benchmarks():
         dwas = fetch_dwas(cursor, soc_code)
 
         # 2. Get exact OCEAN averages
-        job_ocean = ocean_benchmarks.get(soc_code, {
-            "openness": 50.0, "conscientiousness": 50.0,
-            "extraversion": 50.0, "agreeableness": 50.0, "neuroticism": 50.0
-        })
+        job_ocean = ocean_benchmarks.get(soc_code)
+
+        # If the exact variant (e.g., .03) is missing, try to inherit from the base (.00)
+        if job_ocean is None:
+            base_soc = soc_code.split('.')[0] + '.00'
+            job_ocean = ocean_benchmarks.get(base_soc, {
+                "O": None,
+                "C": None,
+                "E": None,
+                "A": None,
+                "N": None
+            })
 
         benchmark_dataset.append({
             "soc_code": soc_code,
@@ -58,11 +68,37 @@ def build_benchmarks():
     conn.close()
 
     # Save to the new synthetic data folder
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(OUTPUT_JSON_PATH), exist_ok=True)
+    with open(OUTPUT_JSON_PATH, "w", encoding="utf-8") as f:
         json.dump(benchmark_dataset, f, indent=4)
 
-    print(f"Success! {len(benchmark_dataset)} Ground Truth records saved to {OUTPUT_PATH}")
+    print(f"Success! {len(benchmark_dataset)} Ground Truth records saved to {OUTPUT_JSON_PATH}")
+
+    with open(OUTPUT_CSV_PATH, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+
+        # Write the flat header
+        writer.writerow([
+            "soc_code", "job_title",
+            "perfect_tasks", "perfect_dwas",
+            "openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"
+        ])
+
+        # Write flattened rows
+        for job in benchmark_dataset:
+            writer.writerow([
+                job["soc_code"],
+                job["job_title"],
+                str(job["perfect_tasks"]),  # Saves array as a stringified list like '["1", "2"]'
+                str(job["perfect_dwas"]),
+                job["base_ocean"]["O"],
+                job["base_ocean"]["C"],
+                job["base_ocean"]["E"],
+                job["base_ocean"]["A"],
+                job["base_ocean"]["N"]
+            ])
+
+    print(f"CSV saved to {OUTPUT_CSV_PATH}")
 
 
 if __name__ == "__main__":
