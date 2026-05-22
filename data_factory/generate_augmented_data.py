@@ -4,8 +4,8 @@ import os
 import csv
 
 INPUT_PATH = "../data/synthetic/benchmark_dataset.json"
-OUTPUT_PATH = "../data/synthetic/training_dataset.json"
-CSV_OUTPUT_PATH = "../data/synthetic/training_dataset.csv"
+OUTPUT_JSON_PATH = "../data/synthetic/training_dataset.json"
+OUTPUT_CSV_PATH = "../data/synthetic/training_dataset.csv"
 
 VARIATIONS_PER_JOB = 10
 NOISE_STD_DEV = 10.0
@@ -54,22 +54,25 @@ def generate_augmented_dataset():
             }
 
             for full_name, short_key in trait_map.items():
-                mu = base_ocean.get(short_key, 50.0)
-                noisy_score = random.gauss(mu, NOISE_STD_DEV)
-                noisy_score = max(0.0, min(100.0, noisy_score))
-                noisy_ocean[full_name] = round(noisy_score, 2)
+                mu = base_ocean.get(short_key)
+                if mu is None:
+                    noisy_ocean[full_name] = None
+                else:
+                    noisy_score = random.gauss(mu, NOISE_STD_DEV)
+                    noisy_score = max(0.0, min(100.0, noisy_score))
+                    noisy_ocean[full_name] = round(noisy_score, 2)
 
             synthetic_candidate["ocean_vector"] = noisy_ocean
             training_dataset.append(synthetic_candidate)
 
     # Save the final ML training dataset
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(OUTPUT_JSON_PATH), exist_ok=True)
+    with open(OUTPUT_JSON_PATH, "w", encoding="utf-8") as f:
         json.dump(training_dataset, f, indent=4)
 
-    print(f"Success! {len(training_dataset)} fully augmented records saved to {OUTPUT_PATH}")
+    print(f"Success! {len(training_dataset)} fully augmented records saved to {OUTPUT_JSON_PATH}")
 
-    with open(CSV_OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
+    with open(OUTPUT_CSV_PATH, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
 
         # Write the flat header
@@ -94,7 +97,7 @@ def generate_augmented_dataset():
                 candidate["ocean_vector"]["neuroticism"]
             ])
 
-    print(f"CSV saved to {CSV_OUTPUT_PATH}")
+    print(f"CSV saved to {OUTPUT_CSV_PATH}")
 
 if __name__ == "__main__":
     generate_augmented_dataset()
