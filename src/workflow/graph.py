@@ -1,76 +1,98 @@
 from langgraph.graph import StateGraph, END
 from .state import CArcState
-from .nodes import mentor_node, profiler_node, ir_node, career_expert_node, evaluate_state_node
-from .evaluator import evaluator_router
+from .nodes import mentor_node, profiler_node, ir_node, career_expert_node, evaluator_node
+from model.evaluator_agent.evaluator import evaluator_router
+
+IR_TURN = 2
+PROFILER_TURN = 2
+EVALUATOR_TURN = 4
 
 
 def dispatch_workers(state: CArcState) -> str:
-    turn = state.get("turn_count", 0)
-    should_run_ir = (turn > 0 and turn % 3 == 0)
-    should_run_profiler = (turn > 0 and turn % 5 == 0)
+    """Determines the first node to run in the sequence (Waterfall entry)."""
 
-    if should_run_profiler and should_run_ir:
-        return "run_both"
-    elif should_run_ir:
-        return "run_ir_only"
-    elif should_run_profiler:
-        return "run_profiler_only"
+    if state.get("mentor_mode") == "counselor":
+        return "mentor"
+
+    turn = state.get("turn_count", 0)
+
+    if turn == 0:
+        return "mentor"
+
+    if turn % PROFILER_TURN == 0:
+        return "profiler"
+    elif turn % IR_TURN == 0:
+        return "ir_extractor"
+    elif turn % EVALUATOR_TURN == 0:
+        return "evaluator_agent"
     else:
-        return "end"
+        return "mentor"
 
 
 def profiler_post_router(state: CArcState) -> str:
-    """
-    Checks if the IR Extractor also needs to run after the Profiler finishes.
-    """
+    """Routes after the Profiler finishes."""
     turn = state.get("turn_count", 0)
-    if turn > 0 and turn % 3 == 0:
-        return "ir_extractor"  # Chain to IR if it's a shared turn (e.g., Turn 30)
-    return "evaluate_state"
+    if turn > 0 and turn % IR_TURN == 0:
+        return "ir_extractor"
+    if turn > 0 and turn % EVALUATOR_TURN == 0:
+        return "evaluator_agent"
+    return "mentor"
+
+
+def ir_post_router(state: CArcState) -> str:
+    """Routes after the IR Extractor finishes."""
+    turn = state.get("turn_count", 0)
+    # Check if we hit the 10-turn milestone
+    if turn > 0 and turn % EVALUATOR_TURN == 0:
+        return "evaluator_agent"
+    return "mentor"
 
 
 def build_graph():
     workflow = StateGraph(CArcState)
 
-    # 1. Register all the Nodes (Including the new funnel node)
+    # 1. Register all the Nodes
     workflow.add_node("mentor", mentor_node)
     workflow.add_node("profiler", profiler_node)
     workflow.add_node("ir_extractor", ir_node)
     workflow.add_node("career_expert", career_expert_node)
-    workflow.add_node("evaluate_state", evaluate_state_node)
+    workflow.add_node("evaluator_agent", evaluator_node)
 
-    # 2. Set Entry Point
-    workflow.set_entry_point("mentor")
-
-    # 3. Add Conditional Dispatch
-    workflow.add_conditional_edges(
-        "mentor",
+    # 2. Set Conditional Entry Point (Waterfall Dispatch)
+    workflow.set_conditional_entry_point(
         dispatch_workers,
         {
-            "run_profiler_only": "profiler",
-            "run_ir_only": "ir_extractor",
-            "run_both": "profiler",
-            "end": END
+            "profiler": "profiler",
+            "ir_extractor": "ir_extractor",
+            "evaluator_agent": "evaluator_agent",
+            "mentor": "mentor"
         }
     )
 
-    # 4. Route workers
-    # Dynamically route Profiler so it doesn't skip IR on overlapping turns
+    # 3. Profiler Routing
     workflow.add_conditional_edges(
         "profiler",
         profiler_post_router,
         {
             "ir_extractor": "ir_extractor",
-            "evaluate_state": "evaluate_state"
+            "evaluator_agent": "evaluator_agent",
+            "mentor": "mentor"
         }
     )
 
-    # IR always goes straight to evaluation when finished
-    workflow.add_edge("ir_extractor", "evaluate_state")
-
-    # 5. Add Conditional Evaluator (The Brain)
+    # 4. IR Extractor Routing
     workflow.add_conditional_edges(
-        "evaluate_state",
+        "ir_extractor",
+        ir_post_router,
+        {
+            "evaluator_agent": "evaluator_agent",
+            "mentor": "mentor"
+        }
+    )
+
+    # 5. Evaluator Routing (The Gatekeeper)
+    workflow.add_conditional_edges(
+        "evaluator_agent",
         evaluator_router,
         {
             "mentor": "mentor",
@@ -78,7 +100,8 @@ def build_graph():
         }
     )
 
-    # 6. Conclude the graph
-    workflow.add_edge("career_expert", END)
+    # 6. Conclude the graph after Action Nodes generate responses
+    workflow.add_edge("mentor", END)
+    workflow.add_edge("career_expert", "mentor")
 
     return workflow.compile()
