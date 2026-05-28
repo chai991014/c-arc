@@ -2,11 +2,16 @@ import xgboost as xgb
 import joblib
 import json
 import numpy as np
+import sqlite3
 from scipy import sparse
 
 
 class CareerExpert:
-    def __init__(self, model_path, encoder_path, task_classes_path, dwa_classes_path):
+    def __init__(self,
+                 model_path="model/career_expert/saved_model/career_expert_v1.json",
+                 encoder_path="model/career_expert/saved_model/label_encoder.pkl",
+                 task_classes_path="model/career_expert/processed_data/task_classes.json",
+                 dwa_classes_path="model/career_expert/processed_data/dwa_classes.json"):
         self.model = xgb.Booster()
         self.model.load_model(model_path)
         self.le = joblib.load(encoder_path)
@@ -37,6 +42,23 @@ class CareerExpert:
             })
 
         return results
+
+    def get_soc_details(self, soc_code: str, db_path: str = "../data/onet.db") -> dict:
+        """Fetches the official job title and description from the O*NET database."""
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT title, description FROM occupation_data WHERE onet_soc_code = ? LIMIT 1",
+                           (soc_code,))
+            row = cursor.fetchone()
+            conn.close()
+
+            if row:
+                return {"title": row[0], "description": row[1]}
+        except sqlite3.Error as e:
+            print(f"[X] SQLite query failed for SOC {soc_code}: {e}")
+
+        return {"title": f"O*NET Role {soc_code}", "description": "A highly recommended career path."}
 
 
 # --- Test Execution ---

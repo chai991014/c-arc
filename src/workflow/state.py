@@ -21,3 +21,6 @@ class CArcState(TypedDict, total=False):
 
     # Tracks which behavioral mode the Mentor should use ('exploratory' or 'directive')
     mentor_mode: str
+
+    # Stores the formatted XGBoost output for the Mentor to deliver
+    final_recommendations: str
