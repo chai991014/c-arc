@@ -2,67 +2,97 @@ import math
 from workflow.state import CArcState
 
 
-def gate_1_trait_variance(ocean_vector: dict, threshold: float = 0.05) -> bool:
-    """
-    Ensures the profile has meaningfully diverged from the initial 0.5 baseline.
-    Calculates the sum of absolute differences from 0.5.
-    """
-    if not ocean_vector:
+def check_signal_strength(ocean_hits: dict, min_total_hits: int = 5) -> bool:
+    """Ensures the LLM has extracted several strong, unambiguous personality signals."""
+    print(f"\n[+] DEBUG - Signal Strength Check:")
+
+    if not ocean_hits:
         return False
 
-    variance = sum(abs(val - 0.5) for val in ocean_vector.values())
-    return variance >= threshold
+    total_hits = sum(ocean_hits.values())
+    print(f"    -> Trait Hits: {ocean_hits}")
+    print(f"    -> Total Strong Signals: {total_hits} | Threshold: >= {min_total_hits}")
+
+    return total_hits >= min_total_hits
 
 
-def gate_2_density_audit(master_profile: dict) -> bool:
-    """Hard fact check: Requires at least 5 ONET-grounded skills."""
-    skills = master_profile.get("skills", [])
-    return len(skills) >= 5
+def check_logit_confidence(cumulative_confidence: float, threshold: float = 3.0) -> bool:
+    """Ensures the LLM has maintained high overall certainty across the conversation."""
+    print(f"\n[+] DEBUG - Logit Confidence Check:")
+    print(f"    -> Accumulated Certainty Score: {cumulative_confidence:.3f} | Threshold: >= {threshold}")
+
+    return cumulative_confidence >= threshold
 
 
-def gate_3_euclidean_stability(ocean_history: list, threshold: float = 0.1) -> bool:
+def audit_entity_density(master_profile: dict, min_entities: int = 5) -> bool:
+    """Hard fact check: Requires a total of at least X ONET-grounded entities across all dimensions."""
+    if not master_profile:
+        return False
+
+    total_density = (
+            len(master_profile.get("tasks", [])) +
+            len(master_profile.get("dwas", [])) +
+            len(master_profile.get("skills", [])) +
+            len(master_profile.get("tech_skills", []))
+    )
+    return total_density >= min_entities
+
+
+def verify_profile_stability(ocean_history: list, threshold: float = 0.1) -> bool:
     """
     Monitors the velocity of change in the OCEAN vector.
     Calculates distance: d = sqrt( sum( (P_t - P_t-1)^2 ) )
     """
+    print(f"\n[+] DEBUG - Profile Stability Check:")
+
     if len(ocean_history) < 2:
+        print("    -> Result: FAILED (Not enough history to calculate distance)")
         return False
 
     p_t = ocean_history[-1]
     p_t_1 = ocean_history[-2]
 
+    # Calculate Euclidean distance
     distance = math.sqrt(sum((p_t.get(k, 0) - p_t_1.get(k, 0)) ** 2 for k in p_t.keys()))
-    return distance < threshold
+
+    # Format vectors for clean console output
+    pt_str = {k: f"{v:.3f}" for k, v in p_t.items()}
+    pt1_str = {k: f"{v:.3f}" for k, v in p_t_1.items()}
+
+    print(f"    -> Vector T-1: {pt1_str}")
+    print(f"    -> Vector T  : {pt_str}")
+    print(f"    -> Euclidean Distance: {distance:.6f} | Threshold: < {threshold}")
+
+    passed = distance < threshold
+    print(f"    -> Stability Result: {'PASS' if passed else 'FAIL'}")
+
+    return passed
 
 
 def evaluator_router(state: CArcState) -> str:
-    """
-    The Triple-Gate router.
-    Returns 'mentor' if gates fail, or 'career_expert' if gates pass.
-    """
+    """The diagnostic router."""
     master_profile = state.get("master_profile", {})
     ocean_history = state.get("ocean_history", [])
-    ocean_vector = state.get("ocean_vector", {})
+    ocean_hits = state.get("ocean_hits", {})
+    cumulative_confidence = state.get("cumulative_confidence", 0.0)
 
     print("\n[?] Evaluator Agent running Diagnostics...")
 
-    # Gate 1: Check Trait Variance (Has the personality profile moved?)
-    pass_gate_1 = gate_1_trait_variance(ocean_vector)
-    print(f"    -> Gate 1 (Trait Variance): {'PASS' if pass_gate_1 else 'FAIL'}")
-    if not pass_gate_1:
-        return "mentor"
+    # Run ALL diagnostic checks
+    has_strong_signals = check_signal_strength(ocean_hits)
+    has_high_confidence = check_logit_confidence(cumulative_confidence)
+    has_sufficient_density = audit_entity_density(master_profile)
+    is_profile_stable = verify_profile_stability(ocean_history)
 
-    # Gate 2: Check Skill Density (Do we have enough O*NET data?)
-    pass_gate_2 = gate_2_density_audit(master_profile)
-    print(f"    -> Gate 2 (Skill Density >= 5): {'PASS' if pass_gate_2 else 'FAIL'}")
-    if not pass_gate_2:
-        return "mentor"
+    print("\n[=] Diagnostic Scorecard:")
+    print(f"    -> Signal Hits (>= 5)   : {'PASS' if has_strong_signals else 'FAIL'}")
+    print(f"    -> High Certainty       : {'PASS' if has_high_confidence else 'FAIL'}")
+    print(f"    -> Entity Density (>= 5): {'PASS' if has_sufficient_density else 'FAIL'}")
+    print(f"    -> Profile Stability    : {'PASS' if is_profile_stable else 'FAIL'}")
 
-    # Gate 3: Check Profile Stability (Has the OCEAN vector settled?)
-    pass_gate_3 = gate_3_euclidean_stability(ocean_history)
-    print(f"    -> Gate 3 (Profile Stability): {'PASS' if pass_gate_3 else 'FAIL'}")
-    if not pass_gate_3:
-        return "mentor"
+    if has_strong_signals and has_high_confidence and has_sufficient_density and is_profile_stable:
+        print("    -> ALL CHECKS PASSED! Transitioning to Career Expert.")
+        return "career_expert"
 
-    print("    -> ALL GATES PASSED! Transitioning to Career Expert.")
-    return "career_expert"
+    print("    -> ROUTING: Diagnostics incomplete. Continuing Phase 1 (Mentor Mode).")
+    return "mentor"

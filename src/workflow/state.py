@@ -24,3 +24,7 @@ class CArcState(TypedDict, total=False):
 
     # Stores the formatted XGBoost output for the Mentor to deliver
     final_recommendations: str
+
+    ocean_hits: Dict[str, int]
+    
+    cumulative_confidence: float

@@ -54,6 +54,18 @@ def run_graph(c_arc_state):
 
                 if "ocean_vector" in state_update:
                     c_arc_state["ocean_vector"] = state_update["ocean_vector"]
+                if "ocean_history" in state_update:
+                    c_arc_state["ocean_history"] = state_update["ocean_history"]
+                if "ocean_hits" in state_update:
+                    c_arc_state["ocean_hits"] = state_update["ocean_hits"]
+                if "cumulative_confidence" in state_update:
+                    c_arc_state["cumulative_confidence"] = state_update["cumulative_confidence"]
+                if "master_profile" in state_update:
+                    c_arc_state["master_profile"] = state_update["master_profile"]
+                if "mentor_mode" in state_update:
+                    c_arc_state["mentor_mode"] = state_update["mentor_mode"]
+                if "final_recommendations" in state_update:
+                    c_arc_state["final_recommendations"] = state_update["final_recommendations"]
 
         return c_arc_state["messages"], c_arc_state, c_arc_state["ocean_vector"]
 
@@ -71,9 +83,11 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     # Initialize the LangGraph state securely in the background
     initial_state = gr.State({
         "messages": [{"role": "assistant", "content": "Hi there! I am the C-Arc Career Counselor. How can I help you today?"}],
-        "master_profile": {"skills": []},
+        "master_profile": {"tasks": [], "dwas": [], "skills": [], "tech_skills": []},
         "ocean_vector": {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5},
         "ocean_history": [],
+        "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},
+        "cumulative_confidence": 0.0,
         "turn_count": 0,
         "mentor_mode": "interviewer"  # Defaulting to interviewer mode
     })
@@ -108,9 +122,11 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
             def reset_state():
                 fresh_state = {
                     "messages": [{"role": "assistant", "content": "Hi there! I am the C-Arc Career Counselor. How can I help you today?"}],
-                    "master_profile": {"skills": []},
+                    "master_profile": {"tasks": [], "dwas": [], "skills": [], "tech_skills": []},
                     "ocean_vector": {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5},
                     "ocean_history": [],
+                    "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},
+                    "cumulative_confidence": 0.0,
                     "turn_count": 0,
                     "mentor_mode": "interviewer"
                 }
