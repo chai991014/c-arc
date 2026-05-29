@@ -7,7 +7,7 @@ from scipy import sparse
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Paths (Adjusted for your new directory structure)
-INPUT_JSON = "../../../data/synthetic/training_dataset.json"
+INPUT_JSON = "../../../data_factory/datasets/synthetic_dataset.json"
 OUTPUT_DIR = "./processed_data"
 
 

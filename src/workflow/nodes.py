@@ -8,7 +8,7 @@ from model.career_expert.inference import CareerExpert
 # Initialize engines
 llm = LocalLLMProvider()
 ir_extractor = IRExtractor()
-ir_mapper = IRMapper(db_path="../data/onet.db", pool_dir="../data/artifacts/")
+ir_mapper = IRMapper(db_path="../data_factory/onet.db", pool_dir="../data_factory/artifacts/")
 expert_engine = CareerExpert()
 
 
