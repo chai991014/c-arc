@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 from .state import CArcState
 from .nodes import mentor_node, profiler_node, ir_node, career_expert_node, evaluator_node
-from model.evaluator_agent.evaluator import evaluator_router
+from agents.evaluator_agent.evaluator import evaluator_router
 
 IR_TURN = 2
 PROFILER_TURN = 2
