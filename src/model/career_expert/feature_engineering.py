@@ -4,9 +4,6 @@ import os
 from sklearn.preprocessing import MultiLabelBinarizer
 from scipy import sparse
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Paths (Adjusted for your new directory structure)
 INPUT_JSON = "../../../data_factory/datasets/synthetic_dataset.json"
 OUTPUT_DIR = "./processed_data"
 
@@ -18,36 +15,50 @@ def engineer_features():
 
     df = pd.DataFrame(data)
 
-    print("Flattening Task and DWA vectors...")
+    print("Flattening ALL Professional Vectors (Tasks, DWAs, Skills, Tech)...")
 
     # 1. One-Hot Encode Skills
     mlb_tasks = MultiLabelBinarizer(sparse_output=True)
     mlb_dwas = MultiLabelBinarizer(sparse_output=True)
+    mlb_skills = MultiLabelBinarizer(sparse_output=True)
+    mlb_tech = MultiLabelBinarizer(sparse_output=True)
 
-    tasks_sparse = mlb_tasks.fit_transform(df['synthetic_tasks'])
-    dwas_sparse = mlb_dwas.fit_transform(df['synthetic_dwas'])
+    # 2. Transform the data
+    tasks_sparse = mlb_tasks.fit_transform(df.get('synthetic_tasks', []))
+    dwas_sparse = mlb_dwas.fit_transform(df.get('synthetic_dwas', []))
+    skills_sparse = mlb_skills.fit_transform(df.get('synthetic_skills', []))
+    tech_sparse = mlb_tech.fit_transform(df.get('synthetic_tech_skills', []))
 
-    # 2. Extract OCEAN traits (Dense data)
+    # 3. Extract OCEAN traits (Dense data)
     ocean_df = pd.json_normalize(df['ocean_vector'])
 
-    # 3. Combine into a final Feature Matrix
-    feature_matrix = sparse.hstack([tasks_sparse, dwas_sparse, ocean_df.values])
+    # 4. Combine into a final Feature Matrix
+    # The stacking order here MUST match the inference vectorization order
+    feature_matrix = sparse.hstack([
+        tasks_sparse,
+        dwas_sparse,
+        skills_sparse,
+        tech_sparse,
+        ocean_df.values
+    ])
 
-    # 4. Save components
+    # 5. Save components
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     df['soc_code'].to_csv(f"{OUTPUT_DIR}/labels.csv", index=False)
     sparse.save_npz(f"{OUTPUT_DIR}/feature_matrix.npz", feature_matrix)
 
-    # CONVERT TO NATIVE INT: This fixes the TypeError
-    task_classes = [int(x) for x in mlb_tasks.classes_]
-    # If DWA IDs are strings, this will work, if they are ints, use the same int(x) logic
-    dwa_classes = list(mlb_dwas.classes_)
+    # Helper function to save classes cleanly
+    def save_classes(mlb, filename):
+        # Convert to int if the IDs are numeric, otherwise keep as string
+        classes = [int(x) if str(x).isdigit() else str(x) for x in mlb.classes_]
+        with open(f"{OUTPUT_DIR}/{filename}", 'w') as f:
+            json.dump(classes, f)
 
-    with open(f"{OUTPUT_DIR}/task_classes.json", 'w') as f:
-        json.dump(task_classes, f)
-    with open(f"{OUTPUT_DIR}/dwa_classes.json", 'w') as f:
-        json.dump(dwa_classes, f)
+    save_classes(mlb_tasks, "task_classes.json")
+    save_classes(mlb_dwas, "dwa_classes.json")
+    save_classes(mlb_skills, "skill_classes.json")
+    save_classes(mlb_tech, "tech_classes.json")
 
     print(f"✅ Success! Feature matrix saved to {OUTPUT_DIR}")
 
