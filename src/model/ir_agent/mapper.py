@@ -12,54 +12,53 @@ class IRMapper:
         logger.info("Loading sentence-transformers model (all-MiniLM-L6-v2)...")
         self.embed_model = SentenceTransformer('all-MiniLM-L6-v2')
 
-        self.skill_ids = []
-        self.skill_texts = []
+        # Dictionary to hold the 3 distinct mapping pools
+        self.pools = {
+            "skill": {"ids": [], "texts": [], "embeddings": None},
+            "task": {"ids": [], "texts": [], "embeddings": None},
+            "dwa": {"ids": [], "texts": [], "embeddings": None}
+        }
 
-        # 1. Load the JSON artifacts safely handling both Dicts and Lists
+        self._load_pool("skill", f"{pool_dir}skill_pool.json")
+        self._load_pool("task", f"{pool_dir}task_pool.json")
+        self._load_pool("dwa", f"{pool_dir}dwa_pool.json")
+
+    def _load_pool(self, pool_name: str, file_path: str):
+        """Loads a JSON artifact and encodes it into VRAM."""
         try:
-            file_path = f"{pool_dir}skill_pool.json"
             with open(file_path, "r") as f:
                 raw_pool = json.load(f)
 
                 if isinstance(raw_pool, list):
-                    # Handles the [{"id": "...", "name": "..."}] format
-                    self.skill_ids = [item.get("id", "") for item in raw_pool]
-                    self.skill_texts = [item.get("name", item.get("title", "")) for item in raw_pool]
-                elif isinstance(raw_pool, dict):
-                    # Handles the {"id": "name"} format
-                    self.skill_ids = list(raw_pool.keys())
-                    self.skill_texts = list(raw_pool.values())
+                    self.pools[pool_name]["ids"] = [item.get("id", "") for item in raw_pool]
+                    self.pools[pool_name]["texts"] = [item.get("name", item.get("title", "")) for item in raw_pool]
 
-            logger.info(f"Successfully loaded {len(self.skill_ids)} skills into VRAM.")
+            logger.info(f"Successfully loaded {len(self.pools[pool_name]['ids'])} items for {pool_name}.")
+
+            if self.pools[pool_name]["texts"]:
+                logger.info(f"Encoding {pool_name.upper()} pool to VRAM...")
+                self.pools[pool_name]["embeddings"] = self.embed_model.encode(
+                    self.pools[pool_name]["texts"], convert_to_tensor=True
+                )
         except FileNotFoundError:
-            logger.warning(f"Could not find {file_path}. Initializing empty pool.")
+            logger.warning(f"Could not find {file_path}. Initializing empty pool for {pool_name}.")
 
-        # 2. Pre-compute embeddings for semantic search
-        if self.skill_texts:
-            logger.info("Encoding SKILL_POOL to VRAM for fast semantic search...")
-            self.skill_embeddings = self.embed_model.encode(self.skill_texts, convert_to_tensor=True)
-        else:
-            self.skill_embeddings = None
+    def ground_phrase(self, raw_text: str, entity_type: str) -> dict:
+        """Vector search against the specified JSON pool, followed by SQL lookup."""
+        pool = self.pools.get(entity_type)
+        if not pool or pool["embeddings"] is None:
+            return {"id": None, "context": None, "score": "N/A (Empty/Invalid Pool)"}
 
-    def ground_phrase(self, raw_text: str, entity_type: str = "skill") -> dict:
-        """
-        Step 1: Vector search against the JSON pool to find the ID.
-        Step 2: SQL query against onet.db using that ID.
-        """
-        if entity_type != "skill" or self.skill_embeddings is None:
-            return {"id": None, "context": None, "score": "N/A (Empty Pool)"}
-
-        # Step 1: Semantic Vector Search
         query_embedding = self.embed_model.encode(raw_text, convert_to_tensor=True)
-        hits = util.semantic_search(query_embedding, self.skill_embeddings, top_k=1)[0]
+        hits = util.semantic_search(query_embedding, pool["embeddings"], top_k=1)[0]
 
         if not hits:
             return {"id": None, "context": None, "score": "N/A (No Hits)"}
 
         best_match_idx = hits[0]['corpus_id']
         best_score = float(hits[0]['score'])
-        matched_id = self.skill_ids[best_match_idx]
-        matched_text = self.skill_texts[best_match_idx]
+        matched_id = pool["ids"][best_match_idx]
+        matched_text = pool["texts"][best_match_idx]
 
         # Return the score even if it fails the threshold so we can debug it!
         if best_score < 0.70:
@@ -70,8 +69,7 @@ class IRMapper:
                 "context": "N/A"
             }
 
-        # Step 2: Relational SQL Lookup
-        context = self._fetch_db_context(matched_id)
+        context = self._fetch_db_context(matched_id, entity_type)
 
         return {
             "id": matched_id,
@@ -80,8 +78,8 @@ class IRMapper:
             "context": context
         }
 
-    def _fetch_db_context(self, element_id: str) -> str:
-        """Fetches the official element name or description from O*NET SQLite."""
+    def _fetch_db_context(self, element_id: str, entity_type: str) -> str:
+        """Fetches the official element name or description from the appropriate O*NET table."""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -91,13 +89,19 @@ class IRMapper:
                 # Your JSON pool formats tech IDs as "TECH-[Skill Name]"
                 # Since the name is built into the ID, we can safely extract it here
                 conn.close()
-                return element_id.replace("TECH-", "")
+                return str(element_id).replace("TECH-", "")
 
-            # Strategy 2: Standard Skills Lookup (for IDs like 2.B.3.e)
-            # Your ingest_excel_table.py created a 'skills' table, not content_model_reference
-            query = "SELECT element_name FROM skills WHERE element_id = ? LIMIT 1"
+            # Dynamic SQL routing based on entity type
+            if entity_type == "skill":
+                cursor.execute("SELECT element_name FROM skills WHERE element_id = ? LIMIT 1", (element_id,))
+            elif entity_type == "task":
+                cursor.execute("SELECT task FROM task_statements WHERE task_id = ? LIMIT 1", (element_id,))
+            elif entity_type == "dwa":
+                cursor.execute("SELECT dwa_title FROM dwa_reference WHERE dwa_id = ? LIMIT 1", (element_id,))
+            else:
+                conn.close()
+                return "Unknown entity type"
 
-            cursor.execute(query, (element_id,))
             row = cursor.fetchone()
             conn.close()
 

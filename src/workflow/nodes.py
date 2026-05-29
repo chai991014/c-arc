@@ -91,8 +91,15 @@ def profiler_node(state: CArcState) -> dict:
     turn_count = state.get("turn_count", 1)
     print(f"\n[➔] STARTING NODE: profiler_node | Turn: {turn_count}")
     current_ocean = state.get("ocean_vector", {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5})
+    current_hits = state.get("ocean_hits") or {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0}
+    current_confidence = state.get("cumulative_confidence", 0.0)
 
-    # Step 4: Profile Inertia (Alpha decay based on turn count)
+    chat_history = "\n".join([
+        f"{(msg.get('role', 'unknown') if isinstance(msg, dict) else msg.type).capitalize()}: "
+        f"{msg.get('content', '') if isinstance(msg, dict) else msg.content}"
+        for msg in messages
+    ])
+
     # Starts at ~0.18, decays down towards a floor of 0.05 as turns accumulate
     alpha = max(0.05, 0.2 / (1 + (turn_count * 0.1)))
 
@@ -105,28 +112,45 @@ def profiler_node(state: CArcState) -> dict:
         'N': 'Neuroticism'
     }
 
-    # Step 3: Logit-Based Rating Engine
+    print("\n[+] DEBUG - Profiler Raw Logits:")
     for trait_key, trait_full in trait_names.items():
         # Force the model to answer with a single classification token
         prompt = (
-            f"Dialogue History: {messages}\n\n"
-            f"Based on this dialogue, is the candidate's {trait_full} trait High or Low?\n"
-            f"Answer strictly with the word High or Low:"
+            f"You are an expert psychological profiler analyzing a candidate.\n\n"
+            f"Conversation Transcript:\n{chat_history}\n\n"
+            f"Based strictly on the candidate's statements above, evaluate their '{trait_full}' trait.\n"
+            f"Is it High or Low? Answer strictly with one word: High or Low:"
         )
 
-        # Extract the probability ratio instead of text generation
-        new_val = llm.get_logit_ratio(prompt, "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B")
-        old_val = current_ocean.get(trait_key, 0.5)
+        # 1. Get the RAW logit probability
+        new_val = float(llm.get_logit_ratio(prompt, "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B"))
 
-        # Apply the Exponential Moving Average (EMA)
-        updated_ocean[trait_key] = round((alpha * float(new_val)) + ((1 - alpha) * float(old_val)), 3)
+        # 2. HIT COUNTER: If probability is heavily skewed (>75% or <25%), it's a strong signal
+        is_hit = new_val >= 0.75 or new_val <= 0.25
+        if is_hit:
+            current_hits[trait_key] += 1
+
+        # 3. ENTROPY / CONFIDENCE ACCUMULATION: Measure certainty (distance from 0.5 neutral)
+        confidence_delta = abs(new_val - 0.5)
+        current_confidence += confidence_delta
+
+        # 4. Apply standard EMA smoothing for the actual profile
+        old_val = current_ocean.get(trait_key, 0.5)
+        updated_ocean[trait_key] = round((alpha * new_val) + ((1 - alpha) * float(old_val)), 3)
+
+        print(f"    -> [{trait_key}] Raw Ratio: {new_val:.4f} | Signal Hit: {'YES' if is_hit else 'NO '} | Conf Delta: +{confidence_delta:.3f} | New EMA: {updated_ocean[trait_key]:.3f}")
 
     current_history = state.get("ocean_history", [])
     updated_history = current_history + [updated_ocean]
 
+    print(f"    => Updated Hit Counter: {current_hits}")
+    print(f"    => New Cumulative Confidence: {current_confidence:.3f}")
+
     return {
         "ocean_vector": updated_ocean,
-        "ocean_history": updated_history
+        "ocean_history": updated_history,
+        "ocean_hits": current_hits,
+        "cumulative_confidence": round(current_confidence, 3)
     }
 
 
@@ -135,51 +159,65 @@ def ir_node(state: CArcState) -> dict:
     turn = state.get("turn_count", 0)
     print(f"\n[➔] STARTING NODE: ir_node | Turn: {turn}")
     messages = state.get("messages", [])
-    current_profile = state.get("master_profile", {"skills": []})
+
+    # Initialize the 4-part profile structure if it doesn't exist
+    current_profile = state.get("master_profile", {})
+    updated_profile = {
+        "tasks": list(current_profile.get("tasks", [])),
+        "dwas": list(current_profile.get("dwas", [])),
+        "skills": list(current_profile.get("skills", [])),
+        "tech_skills": list(current_profile.get("tech_skills", []))
+    }
 
     if not messages:
         return {}
 
-    # 1. The Engine does the heavy ML lifting
     extracted_changes = ir_extractor.extract_intents(messages)
 
-    # 2. Conflict Resolution happening natively in the Node
-    updated_skills = list(current_profile.get("skills", []))
+    if not extracted_changes:
+        print(f"    -> No entities extracted on this turn. Preserving profile history.")
+        print(f"\n[+] DEBUG - Master Profile Updated: {updated_profile}")
+        return {}
 
     for change in extracted_changes:
         intent = change.get("intent")
-        entity_type = change.get("type")
+        entity_type = change.get("type")  # "skill", "task", or "dwa"
         value = change.get("value")
 
-        if not value:
+        if not value or entity_type not in ["skill", "task", "dwa"]:
             continue
 
-        if intent == "ADD" and entity_type == "skill":
-            # Map raw text to ID
-            grounded_data = ir_mapper.ground_phrase(value, entity_type="skill")
-            onet_code = grounded_data.get("id")
+        grounded_data = ir_mapper.ground_phrase(value, entity_type)
+        onet_code = grounded_data.get("id")
 
-            print(f"\n[?] Mapping Attempt for '{value}':")
-            print(f"    -> Score: {grounded_data.get('score', 'N/A')}")
-            print(f"    -> Matched Text: {grounded_data.get('matched_text', 'N/A')}")
-            print(f"    -> Resulting ID: {onet_code}")
+        if not onet_code:
+            continue
 
-            # Conflict Resolution: Prevent duplicate skills
-            if onet_code and onet_code not in updated_skills:
-                updated_skills.append(onet_code)
+        print(f"\n[?] Mapping Attempt for '{value}' ({entity_type}):")
+        print(f"    -> Score: {grounded_data.get('score', 'N/A')}")
+        print(f"    -> Resulting ID: {onet_code}")
 
-        elif intent == "DELETE" and entity_type == "skill":
-            # Map the raw text to ID, then safely remove it if it exists
-            grounded_data = ir_mapper.ground_phrase(value, entity_type="skill")
-            onet_code = grounded_data.get("id")
+        # Route the ID to the correct array
+        if entity_type == "task":
+            target_list = updated_profile["tasks"]
+        elif entity_type == "dwa":
+            target_list = updated_profile["dwas"]
+        elif entity_type == "skill":
+            if str(onet_code).startswith("TECH-"):
+                target_list = updated_profile["tech_skills"]
+            else:
+                target_list = updated_profile["skills"]
 
-            if onet_code in updated_skills:
-                updated_skills.remove(onet_code)
+        # Conflict Resolution
+        if intent == "ADD" and onet_code not in target_list:
+            target_list.append(onet_code)
+        elif intent == "DELETE" and onet_code in target_list:
+            target_list.remove(onet_code)
 
     # Cleanly return the reconciled state
-    print(f"\n[+] DEBUG - Master Profile Updated: {updated_skills}")
+    print(f"\n[+] DEBUG - Master Profile Updated: {updated_profile}")
     return {
-        "master_profile": {"skills": updated_skills}
+        "master_profile": updated_profile
     }
 
 

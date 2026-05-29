@@ -29,12 +29,20 @@ class IRExtractor:
         """
         system_prompt = """
         You are the C-Arc Information Retrieval Extractor.
-        Analyze the ENTIRE provided dialogue history. Extract any technical skills, tools, or professional experiences mentioned by the candidate across ALL of their responses.
+        Analyze the ENTIRE provided dialogue history. Extract technical skills, tools, specific job tasks, and generalized work activities mentioned by the candidate.
         Categorize each entity with an intent: ADD, UPDATE, or DELETE.
-        Entity types must be either: "skill" or "experience".
+
+        Entity types must be EXACTLY one of the following:
+        - "skill" (software, programming languages, tools, and core professional abilities)
+        - "task" (specific job duties, responsibilities, or accomplishments)
+        - "dwa" (detailed work activities or generalized actions/verbs)
 
         Output strictly as a JSON list of dictionaries. Example:
-        [{"intent": "ADD", "type": "skill", "value": "Python programming"}]
+        [
+            {"intent": "ADD", "type": "skill", "value": "Python programming"},
+            {"intent": "ADD", "type": "task", "value": "Designed database schemas"},
+            {"intent": "ADD", "type": "dwa", "value": "Analyze data to identify trends"}
+        ]
 
         If no professional entities are found in the text, return an empty list [].
         """
