@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class IRMapper:
-    def __init__(self, db_path: str = "../data/onet.db", pool_dir: str = "../data/artifacts/"):
+    def __init__(self, db_path: str = "../data_factory/onet.db", pool_dir: str = "../data_factory/artifacts/"):
         self.db_path = db_path
         logger.info("Loading sentence-transformers model (all-MiniLM-L6-v2)...")
         self.embed_model = SentenceTransformer('all-MiniLM-L6-v2')

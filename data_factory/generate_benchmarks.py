@@ -3,10 +3,10 @@ import json
 import os
 import csv
 
-DB_PATH = "../data/onet.db"
-BENCHMARKS_PATH = "../data/artifacts/soc_ocean_benchmarks.json"
-OUTPUT_JSON_PATH = "../data/synthetic/benchmark_dataset.json"
-OUTPUT_CSV_PATH = "../data/synthetic/benchmark_dataset.csv"
+DB_PATH = "./onet.db"
+BENCHMARKS_PATH = "./artifacts/soc_ocean_benchmarks.json"
+OUTPUT_JSON_PATH = "./datasets/benchmark_dataset.json"
+OUTPUT_CSV_PATH = "./datasets/benchmark_dataset.csv"
 
 
 def fetch_occupations(cursor):
@@ -23,6 +23,14 @@ def fetch_dwas(cursor, soc_code):
     cursor.execute("SELECT dwa_id FROM tasks_to_dwas WHERE onet_soc_code = ?", (soc_code,))
     return [row[0] for row in cursor.fetchall()]
 
+def fetch_skills(cursor, soc_code):
+    cursor.execute("SELECT element_id FROM skills WHERE onet_soc_code = ?", (soc_code,))
+    return [row[0] for row in cursor.fetchall()]
+
+
+def fetch_tech_skills(cursor, soc_code):
+    cursor.execute("SELECT example FROM technology_skills WHERE onet_soc_code = ?", (soc_code,))
+    return ["TECH-" + row[0] for row in cursor.fetchall()]
 
 def build_benchmarks():
     print("Connecting to onet.db to build perfect baselines...")
@@ -42,6 +50,8 @@ def build_benchmarks():
         # 1. Fetch ALL tasks and DWAs (No sampling)
         tasks = fetch_tasks(cursor, soc_code)
         dwas = fetch_dwas(cursor, soc_code)
+        skills = fetch_skills(cursor, soc_code)
+        tech_skills = fetch_tech_skills(cursor, soc_code)
 
         # 2. Get exact OCEAN averages
         job_ocean = ocean_benchmarks.get(soc_code)
@@ -62,12 +72,14 @@ def build_benchmarks():
             "job_title": title,
             "perfect_tasks": tasks,
             "perfect_dwas": dwas,
+            "perfect_skills": skills,
+            "perfect_tech_skills": tech_skills,
             "base_ocean": job_ocean
         })
 
     conn.close()
 
-    # Save to the new synthetic data folder
+    # Save to the new datasets data_factory folder
     os.makedirs(os.path.dirname(OUTPUT_JSON_PATH), exist_ok=True)
     with open(OUTPUT_JSON_PATH, "w", encoding="utf-8") as f:
         json.dump(benchmark_dataset, f, indent=4)
@@ -79,9 +91,17 @@ def build_benchmarks():
 
         # Write the flat header
         writer.writerow([
-            "soc_code", "job_title",
-            "perfect_tasks", "perfect_dwas",
-            "openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"
+            "soc_code",
+            "job_title",
+            "perfect_tasks",
+            "perfect_dwas",
+            "perfect_skills",
+            "perfect_tech_skills",
+            "openness",
+            "conscientiousness",
+            "extraversion",
+            "agreeableness",
+            "neuroticism"
         ])
 
         # Write flattened rows
@@ -91,6 +111,8 @@ def build_benchmarks():
                 job["job_title"],
                 str(job["perfect_tasks"]),  # Saves array as a stringified list like '["1", "2"]'
                 str(job["perfect_dwas"]),
+                str(job["perfect_skills"]),
+                str(job["perfect_tech_skills"]),
                 job["base_ocean"]["O"],
                 job["base_ocean"]["C"],
                 job["base_ocean"]["E"],

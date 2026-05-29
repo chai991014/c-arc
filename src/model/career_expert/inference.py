@@ -43,7 +43,7 @@ class CareerExpert:
 
         return results
 
-    def get_soc_details(self, soc_code: str, db_path: str = "../data/onet.db") -> dict:
+    def get_soc_details(self, soc_code: str, db_path: str = "../data_factory/onet.db") -> dict:
         """Fetches the official job title and description from the O*NET database."""
         try:
             conn = sqlite3.connect(db_path)

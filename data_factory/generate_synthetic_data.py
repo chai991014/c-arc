@@ -1,0 +1,117 @@
+import json
+import random
+import os
+import csv
+
+INPUT_PATH = "./datasets/benchmark_dataset.json"
+OUTPUT_JSON_PATH = "./datasets/synthetic_dataset.json"
+OUTPUT_CSV_PATH = "./datasets/synthetic_dataset.csv"
+
+VARIATIONS_PER_JOB = 10
+NOISE_STD_DEV = 10.0
+
+def generate_augmented_dataset():
+    print(f"Loading Ground Truth benchmarks from {INPUT_PATH}...")
+    with open(INPUT_PATH, 'r', encoding='utf-8') as f:
+        benchmarks = json.load(f)
+
+    training_dataset = []
+
+    print(f"Applying data_factory augmentation (Skill Sampling + N(0,{NOISE_STD_DEV}) Personality Noise)...")
+    print(f"Generating {VARIATIONS_PER_JOB} variations per job...")
+
+    for job in benchmarks:
+        soc = job['soc_code']
+        perfect_tasks = job.get('perfect_tasks', [])
+        perfect_dwas = job.get('perfect_dwas', [])
+        perfect_skills = job.get('perfect_skills', [])
+        perfect_tech_skills = job.get('perfect_tech_skills', [])
+        base_ocean = job.get('base_ocean', {})
+
+        for i in range(VARIATIONS_PER_JOB):
+            # 1. Augment Technical Dimensions (Sample 60% to 80% randomly)
+            task_sample = int(len(perfect_tasks) * random.uniform(0.6, 0.8))
+            dwa_sample = int(len(perfect_dwas) * random.uniform(0.6, 0.8))
+            skill_sample = int(len(perfect_skills) * random.uniform(0.6, 0.8))
+            tech_sample = int(len(perfect_tech_skills) * random.uniform(0.6, 0.8))
+
+            synthetic_candidate = {
+                "candidate_id": f"{soc}_var_{i+1}",
+                "soc_code": soc,
+                "job_title": job.get('job_title'),
+                "synthetic_tasks": random.sample(perfect_tasks, task_sample) if perfect_tasks else [],
+                "synthetic_dwas": random.sample(perfect_dwas, dwa_sample) if perfect_dwas else [],
+                "synthetic_skills": random.sample(perfect_skills, skill_sample) if perfect_skills else [],
+                "synthetic_tech_skills": random.sample(perfect_tech_skills, tech_sample) if perfect_tech_skills else []
+            }
+
+            # 2. Augment Personality Scores (Add Gaussian Noise)
+            noisy_ocean = {}
+
+            trait_map = {
+                "openness": "O",
+                "conscientiousness": "C",
+                "extraversion": "E",
+                "agreeableness": "A",
+                "neuroticism": "N"
+            }
+
+            for full_name, short_key in trait_map.items():
+                mu = base_ocean.get(short_key)
+                if mu is None:
+                    noisy_ocean[full_name] = None
+                else:
+                    noisy_score = random.gauss(mu, NOISE_STD_DEV)
+                    noisy_score = max(0.0, min(100.0, noisy_score))
+                    noisy_ocean[full_name] = round(noisy_score, 2)
+
+            synthetic_candidate["ocean_vector"] = noisy_ocean
+            training_dataset.append(synthetic_candidate)
+
+    # Save the final ML training dataset
+    os.makedirs(os.path.dirname(OUTPUT_JSON_PATH), exist_ok=True)
+    with open(OUTPUT_JSON_PATH, "w", encoding="utf-8") as f:
+        json.dump(training_dataset, f, indent=4)
+
+    print(f"Success! {len(training_dataset)} fully augmented records saved to {OUTPUT_JSON_PATH}")
+
+    with open(OUTPUT_CSV_PATH, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+
+        # Write the flat header
+        writer.writerow([
+            "candidate_id",
+            "soc_code",
+            "job_title",
+            "synthetic_tasks",
+            "synthetic_dwas",
+            "synthetic_skills",
+            "synthetic_tech_skills",
+            "openness",
+            "conscientiousness",
+            "extraversion",
+            "agreeableness",
+            "neuroticism"
+        ])
+
+        # Write flattened rows
+        for candidate in training_dataset:
+            writer.writerow([
+                candidate["candidate_id"],
+                candidate["soc_code"],
+                candidate["job_title"],
+                str(candidate["synthetic_tasks"]),
+                str(candidate["synthetic_dwas"]),
+                str(candidate["synthetic_skills"]),
+                str(candidate["synthetic_tech_skills"]),
+                candidate["ocean_vector"]["openness"],
+                candidate["ocean_vector"]["conscientiousness"],
+                candidate["ocean_vector"]["extraversion"],
+                candidate["ocean_vector"]["agreeableness"],
+                candidate["ocean_vector"]["neuroticism"]
+            ])
+
+    print(f"Success! {len(training_dataset)} fully augmented records saved to CSV and JSON.")
+
+if __name__ == "__main__":
+    generate_augmented_dataset()
