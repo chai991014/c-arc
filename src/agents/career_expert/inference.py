@@ -8,9 +8,9 @@ from scipy import sparse
 
 class CareerExpert:
     def __init__(self,
-                 model_path="model/career_expert/saved_model/career_expert_v1.json",
-                 encoder_path="model/career_expert/saved_model/label_encoder.pkl",
-                 data_dir="model/career_expert/processed_data"):
+                 model_path="agents/career_expert/saved_model/career_expert_v1.json",
+                 encoder_path="agents/career_expert/saved_model/label_encoder.pkl",
+                 data_dir="agents/career_expert/processed_data"):
 
         self.model = xgb.Booster()
         self.model.load_model(model_path)
