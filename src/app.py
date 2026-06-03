@@ -83,13 +83,25 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     # Initialize the LangGraph state securely in the background
     initial_state = gr.State({
         "messages": [{"role": "assistant", "content": "Hi there! I am the C-Arc Career Counselor. How can I help you today?"}],
-        "master_profile": {"tasks": [], "dwas": [], "skills": [], "tech_skills": []},
+        "master_profile": {
+            "tasks": [],
+            "dwas": [],
+            "skills": [],
+            "tech_skills": [],
+            "basic_info": {
+                "full_name": None,
+                "email": None,
+                "phone": None,
+                "location": None
+            },
+            "education": []
+        },
         "ocean_vector": {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5},
         "ocean_history": [],
         "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},
         "cumulative_confidence": 0.0,
         "turn_count": 0,
-        "mentor_mode": "interviewer"  # Defaulting to interviewer mode
+        "mentor_mode": "interviewer"
     })
 
     with gr.Row():
@@ -122,7 +134,19 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
             def reset_state():
                 fresh_state = {
                     "messages": [{"role": "assistant", "content": "Hi there! I am the C-Arc Career Counselor. How can I help you today?"}],
-                    "master_profile": {"tasks": [], "dwas": [], "skills": [], "tech_skills": []},
+                    "master_profile": {
+                        "tasks": [],
+                        "dwas": [],
+                        "skills": [],
+                        "tech_skills": [],
+                        "basic_info": {
+                            "full_name": None,
+                            "email": None,
+                            "phone": None,
+                            "location": None
+                        },
+                        "education": []
+                    },
                     "ocean_vector": {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5},
                     "ocean_history": [],
                     "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},

@@ -38,6 +38,22 @@ def audit_entity_density(master_profile: dict, min_entities: int = 5) -> bool:
     return total_density >= min_entities
 
 
+def verify_demographic_completeness(master_profile: dict) -> bool:
+    """Strict gate: Enforces that basic info and education are explicitly extracted."""
+    print(f"\n[+] DEBUG - Demographic Completeness Check:")
+    basic_info = master_profile.get("basic_info", {})
+    education = master_profile.get("education", [])
+
+    required_fields = ["full_name", "location", "email", "phone"]
+    missing_fields = [f for f in required_fields if not basic_info.get(f)]
+
+    if not education:
+        missing_fields.append("education")
+
+    print(f"    -> Missing Mandatory Fields: {missing_fields if missing_fields else 'NONE'}")
+    return len(missing_fields) == 0
+
+
 def verify_profile_stability(ocean_history: list, threshold: float = 0.1) -> bool:
     """
     Monitors the velocity of change in the OCEAN vector.
@@ -79,18 +95,20 @@ def evaluator_router(state: CArcState) -> str:
     print("\n[?] Evaluator Agent running Diagnostics...")
 
     # Run ALL diagnostic checks
+    has_demographics = verify_demographic_completeness(master_profile)
     has_strong_signals = check_signal_strength(ocean_hits)
     has_high_confidence = check_logit_confidence(cumulative_confidence)
     has_sufficient_density = audit_entity_density(master_profile)
     is_profile_stable = verify_profile_stability(ocean_history)
 
     print("\n[=] Diagnostic Scorecard:")
+    print(f"    -> Profile Completeness : {'PASS' if has_demographics else 'FAIL'}")
     print(f"    -> Signal Hits (>= 5)   : {'PASS' if has_strong_signals else 'FAIL'}")
     print(f"    -> High Certainty       : {'PASS' if has_high_confidence else 'FAIL'}")
     print(f"    -> Entity Density (>= 5): {'PASS' if has_sufficient_density else 'FAIL'}")
     print(f"    -> Profile Stability    : {'PASS' if is_profile_stable else 'FAIL'}")
 
-    if has_strong_signals and has_high_confidence and has_sufficient_density and is_profile_stable:
+    if has_demographics and has_strong_signals and has_high_confidence and has_sufficient_density and is_profile_stable:
         print("    -> ALL CHECKS PASSED! Transitioning to Career Expert.")
         return "career_expert"
 
