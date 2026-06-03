@@ -15,6 +15,24 @@ def execute_mentor(state: CArcState, llm) -> dict:
     mode = state.get("mentor_mode", "interviewer")  # Default Phase 1 mode
     final_recs = state.get("final_recommendations", "")
 
+    master_profile = state.get("master_profile") or {}
+    basic_info = master_profile.get("basic_info", {})
+    education = master_profile.get("education", [])
+
+    missing_items = []
+    if not basic_info.get("full_name"): missing_items.append("their full name")
+    if not basic_info.get("location"): missing_items.append("their current location (city/country)")
+    if not basic_info.get("email"): missing_items.append("their email address")
+    if not basic_info.get("phone"): missing_items.append("their contact phone number")
+    if not education: missing_items.append("their educational background (degree/major/institution)")
+
+    demographic_guidance = ""
+    if missing_items:
+        demographic_guidance = f"""
+        Mandatory fields still missing from candidate's resume profile: {', '.join(missing_items)}.
+        Prioritize gently asking for these missing details naturally within your response.
+        """
+
     if mode == "interviewer":
         system_prompt = (
             "You are the C-Arc Career Interviewer. Your goal is to get to know the candidate "
@@ -26,7 +44,7 @@ def execute_mentor(state: CArcState, llm) -> dict:
             "Limit your replies to 2-3 short sentences. Never write long paragraphs or monologues. "
             "Never output your internal thinking process. Output ONLY your direct dialogue."
         )
-        user_prompt = f"User Profile: OCEAN={ocean}. Turn={turn}.\n\nConversation History:\n{chat_history}\n\nPlease respond to the candidate's last message."
+        user_prompt = f"User Profile: OCEAN={ocean}. Turn={turn}.{demographic_guidance}\n\nConversation History:\n{chat_history}\n\nPlease respond to the candidate's last message."
 
     elif mode == "counselor":
         system_prompt = (

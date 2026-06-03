@@ -9,7 +9,9 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
         "tasks": list(current_profile.get("tasks", [])),
         "dwas": list(current_profile.get("dwas", [])),
         "skills": list(current_profile.get("skills", [])),
-        "tech_skills": list(current_profile.get("tech_skills", []))
+        "tech_skills": list(current_profile.get("tech_skills", [])),
+        "basic_info": dict(current_profile.get("basic_info", {"full_name": None, "email": None, "phone": None, "location": None})),
+        "education": list(current_profile.get("education", []))
     }
 
     if not messages:
@@ -24,10 +26,26 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
 
     for change in extracted_changes:
         intent = change.get("intent")
-        entity_type = change.get("type")  # "skill", "task", or "dwa"
+        entity_type = change.get("type")
         value = change.get("value")
 
-        if not value or entity_type not in ["skill", "task", "dwa"]:
+        if not value:
+            continue
+
+        if entity_type == "basic_info" and isinstance(value, dict):
+            for k, v in value.items():
+                if v:  # Only update if the LLM actually found a value
+                    updated_profile["basic_info"][k] = v
+            continue
+
+        elif entity_type == "education" and isinstance(value, dict):
+            # Prevent appending exact duplicate education records
+            if value not in updated_profile["education"]:
+                updated_profile["education"].append(value)
+            continue
+
+        # Fall back to your legacy O*NET database matching for standard skills/tasks
+        if entity_type not in ["skill", "task", "dwa"]:
             continue
 
         grounded_data = ir_mapper.ground_phrase(value, entity_type)

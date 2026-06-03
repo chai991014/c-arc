@@ -27,25 +27,29 @@ class IRExtractor:
         """
         Uses DeepSeek Reasoner API to parse dialogue history for professional changes.
         """
-        system_prompt = """
-        You are the C-Arc Information Retrieval Extractor.
-        Analyze the ENTIRE provided dialogue history. Extract technical skills, tools, specific job tasks, and generalized work activities mentioned by the candidate.
-        Categorize each entity with an intent: ADD, UPDATE, or DELETE.
+        system_prompt = (
+            "You are a precise data extraction agent. Your job is to analyze the entire conversation history "
+            "and extract professional competencies, work experience, and candidate demographics to construct a resume profile.\n\n"
 
-        Entity types must be EXACTLY one of the following:
-        - "skill" (software, programming languages, tools, and core professional abilities)
-        - "task" (specific job duties, responsibilities, or accomplishments)
-        - "dwa" (detailed work activities or generalized actions/verbs)
+            "Categorize every extracted entity into exactly one of these types:\n"
+            "1. 'skill' - Core professional capabilities or tools (e.g., 'Python', 'Machine learning').\n"
+            "2. 'task' - Highly specific job duties or project achievements (e.g., 'Developed a RAG system').\n"
+            "3. 'dwa' - Generalized transferable work activities (e.g., 'Analyze data to identify trends').\n"
+            "4. 'basic_info' - Candidate personal metadata. Return a dictionary containing keys: 'full_name', 'email', 'phone', 'location'.\n"
+            "5. 'education' - Academic achievements. Return a dictionary containing keys: 'degree', 'major', 'institution', 'grad_year'.\n\n"
 
-        Output strictly as a JSON list of dictionaries. Example:
-        [
-            {"intent": "ADD", "type": "skill", "value": "Python programming"},
-            {"intent": "ADD", "type": "task", "value": "Designed database schemas"},
-            {"intent": "ADD", "type": "dwa", "value": "Analyze data to identify trends"}
-        ]
+            "Rules:\n"
+            "- Use intent 'ADD' for newly mentioned details, or 'DELETE' if the user corrects/removes info.\n"
+            "- For 'basic_info' and 'education', only capture fields explicitly stated by the user. Leave missing keys as null.\n"
+            "- Output your final answer STRICTLY as a valid JSON list of objects. No thinking process, no markdown wrappers outside the json block.\n\n"
 
-        If no professional entities are found in the text, return an empty list [].
-        """
+            "CRITICAL OUTPUT FORMAT EXAMPLE:\n"
+            "[\n"
+            "    {\"intent\": \"ADD\", \"type\": \"basic_info\", \"value\": {\"full_name\": \"JY\", \"location\": \"Cheras, Malaysia\", \"email\": null, \"phone\": null}},\n"
+            "    {\"intent\": \"ADD\", \"type\": \"education\", \"value\": {\"degree\": \"Master\", \"major\": \"AI\", \"institution\": \"UM\", \"grad_year\": 2026}},\n"
+            "    {\"intent\": \"ADD\", \"type\": \"skill\", \"value\": \"Python\"}\n"
+            "]"
+        )
 
         # Look at the most recent context to save tokens
         recent_context = dialogue_history[-4:] if len(dialogue_history) >= 4 else dialogue_history
