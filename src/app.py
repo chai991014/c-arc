@@ -32,6 +32,17 @@ def add_user_message(user_input, c_arc_state):
     return c_arc_state["messages"], c_arc_state, ""
 
 
+def handle_profile_confirmation(c_arc_state):
+    """Triggered when the user clicks the verification button."""
+    c_arc_state["profile_verified"] = True
+    c_arc_state["messages"].append({
+        "role": "user",
+        "content": "[Profile Confirmed by User. Transitioning to Career Expert Inference Engine.]"
+    })
+    c_arc_state["turn_count"] += 1
+    return c_arc_state["messages"], c_arc_state, gr.update(interactive=False, variant="success")
+
+
 def run_graph(c_arc_state):
     """Executes the LangGraph workflow after the UI has updated."""
     # Prevent running if the last message isn't from the user
@@ -67,13 +78,21 @@ def run_graph(c_arc_state):
                 if "final_recommendations" in state_update:
                     c_arc_state["final_recommendations"] = state_update["final_recommendations"]
 
-        return c_arc_state["messages"], c_arc_state, c_arc_state["ocean_vector"]
+        is_validating = (c_arc_state.get("mentor_mode") == "validation")
+        print(f"\n[DEBUG UI] Mentor Mode: '{c_arc_state.get('mentor_mode')}' | Showing Button: {is_validating}")
+
+        if is_validating:
+            button_update = gr.update(interactive=True, variant="primary")
+        else:
+            button_update = gr.update(interactive=False, variant="success")
+
+        return c_arc_state["messages"], c_arc_state, c_arc_state["ocean_vector"], button_update
 
     except Exception as e:
         import traceback
         error_msg = f"❌ Execution crashed:\n{traceback.format_exc()}"
         c_arc_state["messages"].append({"role": "assistant", "content": error_msg})
-        return c_arc_state["messages"], c_arc_state, c_arc_state.get("ocean_vector", {})
+        return c_arc_state["messages"], c_arc_state, c_arc_state.get("ocean_vector", {}), gr.update(interactive=False)
 
 
 # Define the Gradio Interface
@@ -101,7 +120,8 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
         "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},
         "cumulative_confidence": 0.0,
         "turn_count": 0,
-        "mentor_mode": "interviewer"
+        "mentor_mode": "interviewer",
+        "profile_verified": False
     })
 
     with gr.Row():
@@ -130,6 +150,13 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
             # Optional button to reset the state without restarting the server
             clear_btn = gr.Button("Reset Conversation")
 
+            confirm_profile_btn = gr.Button(
+                "✅ Confirm & Proceed to Career Recommendations",
+                variant="success",
+                interactive=False,
+                visible=True
+            )
+
 
             def reset_state():
                 fresh_state = {
@@ -152,7 +179,8 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
                     "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},
                     "cumulative_confidence": 0.0,
                     "turn_count": 0,
-                    "mentor_mode": "interviewer"
+                    "mentor_mode": "interviewer",
+                    "profile_verified": False
                 }
                 return fresh_state["messages"], fresh_state, fresh_state["ocean_vector"]
 
@@ -167,10 +195,9 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, ocean_display]
+        outputs=[chatbot, initial_state, ocean_display, confirm_profile_btn]
     )
 
-    # Wire up the submit button
     submit_btn.click(
         add_user_message,
         inputs=[msg, initial_state],
@@ -178,7 +205,17 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, ocean_display]
+        outputs=[chatbot, initial_state, ocean_display, confirm_profile_btn]
+    )
+
+    confirm_profile_btn.click(
+        handle_profile_confirmation,
+        inputs=[initial_state],
+        outputs=[chatbot, initial_state, confirm_profile_btn]
+    ).then(
+        run_graph,
+        inputs=[initial_state],
+        outputs=[chatbot, initial_state, ocean_display, confirm_profile_btn]
     )
 
 if __name__ == "__main__":

@@ -46,6 +46,8 @@ def execute_career_expert(state: CArcState, expert_engine) -> dict:
 
         formatted_recs = "\n\n".join(rec_details)
         print(f"    -> XGBoost generated {len(predictions)} recommendations. Transitioning to Counselor Mode.")
+        print(f"    -> Recommendations:")
+        print(formatted_recs)
 
     # 5. Push the state updates to trigger Phase 2
     return {

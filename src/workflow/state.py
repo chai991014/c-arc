@@ -28,3 +28,5 @@ class CArcState(TypedDict, total=False):
     ocean_hits: Dict[str, int]
     
     cumulative_confidence: float
+
+    profile_verified: bool

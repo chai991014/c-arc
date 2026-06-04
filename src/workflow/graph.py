@@ -1,7 +1,6 @@
 from langgraph.graph import StateGraph, END
 from .state import CArcState
 from .nodes import mentor_node, profiler_node, ir_node, career_expert_node, evaluator_node
-from agents.evaluator_agent.evaluator import evaluator_router
 
 IR_TURN = 2
 PROFILER_TURN = 2
@@ -13,6 +12,14 @@ def dispatch_workers(state: CArcState) -> str:
 
     if state.get("mentor_mode") == "counselor":
         return "mentor"
+
+    if state.get("mentor_mode") == "validation":
+        if state.get("profile_verified") is True:
+            print("    -> Permission confirmed. Moving to XGBoost Inference Engine.")
+            return "career_expert"
+        else:
+            print("    -> Enter validation loop.")
+            return "profiler"
 
     turn = state.get("turn_count", 0)
 
@@ -31,6 +38,8 @@ def dispatch_workers(state: CArcState) -> str:
 
 def profiler_post_router(state: CArcState) -> str:
     """Routes after the Profiler finishes."""
+    if state.get("mentor_mode") == "validation":
+        return "ir_extractor"
     turn = state.get("turn_count", 0)
     if turn > 0 and turn % IR_TURN == 0:
         return "ir_extractor"
@@ -41,6 +50,8 @@ def profiler_post_router(state: CArcState) -> str:
 
 def ir_post_router(state: CArcState) -> str:
     """Routes after the IR Extractor finishes."""
+    if state.get("mentor_mode") == "validation":
+        return "mentor"
     turn = state.get("turn_count", 0)
     # Check if we hit the 10-turn milestone
     if turn > 0 and turn % EVALUATOR_TURN == 0:
@@ -65,7 +76,8 @@ def build_graph():
             "profiler": "profiler",
             "ir_extractor": "ir_extractor",
             "evaluator_agent": "evaluator_agent",
-            "mentor": "mentor"
+            "mentor": "mentor",
+            "career_expert": "career_expert"
         }
     )
 
@@ -90,18 +102,9 @@ def build_graph():
         }
     )
 
-    # 5. Evaluator Routing (The Gatekeeper)
-    workflow.add_conditional_edges(
-        "evaluator_agent",
-        evaluator_router,
-        {
-            "mentor": "mentor",
-            "career_expert": "career_expert"
-        }
-    )
-
-    # 6. Conclude the graph after Action Nodes generate responses
-    workflow.add_edge("mentor", END)
+    # 5. Conclude the graph after Action Nodes generate responses
+    workflow.add_edge("evaluator_agent", "mentor")
     workflow.add_edge("career_expert", "mentor")
+    workflow.add_edge("mentor", END)
 
     return workflow.compile()

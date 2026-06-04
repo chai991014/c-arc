@@ -85,16 +85,16 @@ def verify_profile_stability(ocean_history: list, threshold: float = 0.1) -> boo
     return passed
 
 
-def evaluator_router(state: CArcState) -> str:
-    """The diagnostic router."""
+def execute_evaluator(state: CArcState) -> dict:
+    # Skip checks if already in validation or counselor mode
+    if state.get("mentor_mode") in ["validation", "counselor"]:
+        return {}
+
     master_profile = state.get("master_profile", {})
-    ocean_history = state.get("ocean_history", [])
     ocean_hits = state.get("ocean_hits", {})
     cumulative_confidence = state.get("cumulative_confidence", 0.0)
+    ocean_history = state.get("ocean_history", [])
 
-    print("\n[?] Evaluator Agent running Diagnostics...")
-
-    # Run ALL diagnostic checks
     has_demographics = verify_demographic_completeness(master_profile)
     has_strong_signals = check_signal_strength(ocean_hits)
     has_high_confidence = check_logit_confidence(cumulative_confidence)
@@ -109,8 +109,8 @@ def evaluator_router(state: CArcState) -> str:
     print(f"    -> Profile Stability    : {'PASS' if is_profile_stable else 'FAIL'}")
 
     if has_demographics and has_strong_signals and has_high_confidence and has_sufficient_density and is_profile_stable:
-        print("    -> ALL CHECKS PASSED! Transitioning to Career Expert.")
-        return "career_expert"
+        print("    -> ALL CHECKS PASSED! Shifting to Validation Loop.")
+        return {"mentor_mode": "validation"}
 
     print("    -> ROUTING: Diagnostics incomplete. Continuing Phase 1 (Mentor Mode).")
-    return "mentor"
+    return {}
