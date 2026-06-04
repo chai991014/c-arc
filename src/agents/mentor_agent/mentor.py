@@ -1,4 +1,34 @@
+import sqlite3
 from workflow.state import CArcState
+
+
+def translate_onet_ids(master_profile: dict, db_path: str = "../data_factory/onet.db") -> dict:
+    translated = {"tasks": [], "dwas": [], "skills": [], "tech_skills": []}
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        for t_id in master_profile.get("tasks", []):
+            cursor.execute("SELECT task FROM task_statements WHERE task_id = ?", (t_id,))
+            row = cursor.fetchone()
+            translated["tasks"].append(row[0] if row else t_id)
+        for d_id in master_profile.get("dwas", []):
+            cursor.execute("SELECT dwa_title FROM dwa_reference WHERE dwa_id = ?", (d_id,))
+            row = cursor.fetchone()
+            translated["dwas"].append(row[0] if row else d_id)
+        for s_id in master_profile.get("skills", []):
+            cursor.execute("SELECT element_name FROM skills WHERE element_id = ?", (s_id,))
+            row = cursor.fetchone()
+            translated["skills"].append(row[0] if row else s_id)
+        conn.close()
+    except Exception as e:
+        print(f"[X] Translation Error: {e}")
+        translated["tasks"] = master_profile.get("tasks", [])
+        translated["dwas"] = master_profile.get("dwas", [])
+        translated["skills"] = master_profile.get("skills", [])
+
+    translated["tech_skills"] = [tech.replace("TECH-", "") for tech in master_profile.get("tech_skills", [])]
+    return translated
+
 
 def execute_mentor(state: CArcState, llm) -> dict:
     ocean = state.get("ocean_vector", {})
@@ -46,6 +76,16 @@ def execute_mentor(state: CArcState, llm) -> dict:
         )
         user_prompt = f"User Profile: OCEAN={ocean}. Turn={turn}.{demographic_guidance}\n\nConversation History:\n{chat_history}\n\nPlease respond to the candidate's last message."
 
+    elif mode == "validation":
+        system_prompt = (
+            "You are the C-Arc Profile Validator. Phase 1 exploration is complete. "
+            "Your task is to acknowledge the candidate's latest message in 1-2 short sentences. "
+            "If they provided corrections, acknowledge them warmly. "
+            "CRITICAL: Keep your response ultra-short. Do NOT attempt to generate or type out their profile data. "
+            "Just tell them to review the profile below and click 'Confirm & Proceed'."
+        )
+        user_prompt = f"Conversation History:\n{chat_history}\n\nPlease respond to the candidate."
+
     elif mode == "counselor":
         system_prompt = (
             "You are the C-Arc Career Counselor. Phase 1 is complete. "
@@ -83,6 +123,29 @@ def execute_mentor(state: CArcState, llm) -> dict:
         else:
             # Fallback if no double newline exists: try to split at the last known header
             response = response.split("Construct the Response:")[-1].strip()
+
+    # Manually attach the exact Markdown summary to the final output so the UI displays it perfectly.
+    if mode == "validation":
+        readable_data = translate_onet_ids(master_profile)
+        all_skills = readable_data["skills"] + readable_data["tech_skills"]
+        skills_display = ", ".join(all_skills) if all_skills else "None"
+        all_experience = readable_data["tasks"] + readable_data["dwas"]
+        exp_display = "\n* ".join([""] + all_experience) if all_experience else "None"
+
+        profile_summary = (
+            f"### 📋 Your Profile Summary\n"
+            f"**Name:** {master_profile.get('basic_info', {}).get('full_name', 'Not provided')}\n"
+            f"**Location:** {master_profile.get('basic_info', {}).get('location', 'Not provided')}\n"
+            f"**Contact:** {master_profile.get('basic_info', {}).get('email', 'N/A')} | {master_profile.get('basic_info', {}).get('phone', 'N/A')}\n\n"
+            f"**Education:** {', '.join([f['degree'] + ' in ' + f['major'] for f in master_profile.get('education', [])]) if master_profile.get('education') else 'Not provided'}\n\n"
+            f"**Extracted Skills:**\n{skills_display}\n\n"
+            f"**Tracked Work Responsibilities:**{exp_display}\n\n"
+            f"---\n"
+            f"Please check through these details. If everything is correct and you have no more modifications, "
+            f"please click the **Confirm & Proceed** button below to generate your expert career matches!"
+        )
+
+        response = f"{response}\n\n{profile_summary}"
 
     return {
         "messages": [{"role": "assistant", "content": response}]

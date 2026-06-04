@@ -9,6 +9,7 @@ from agents.mentor_agent.mentor import execute_mentor
 from agents.profiler_agent.profiler import execute_profiler
 from agents.ir_agent.ir import execute_ir
 from agents.career_expert.expert import execute_career_expert
+from agents.evaluator_agent.evaluator import execute_evaluator
 
 # Initialize engines
 llm = LocalLLMProvider()
@@ -48,4 +49,4 @@ def evaluator_node(state: CArcState) -> dict:
     """Pass-through node to funnel workers into the Evaluator Router."""
     turn = state.get("turn_count", 0)
     print(f"\n[➔] STARTING NODE: evaluate_state_node | Turn: {turn}")
-    return {}
+    return execute_evaluator(state)
