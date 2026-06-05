@@ -7,26 +7,50 @@ def translate_onet_ids(master_profile: dict, db_path: str = "../data_factory/one
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
+
+        # Use a Set to automatically handle duplicate DWA IDs
+        rolled_up_dwas = set(master_profile.get("dwas", []))
+        unlinked_tasks = []
+
+        # 1. Roll-up Tasks to DWAs
         for t_id in master_profile.get("tasks", []):
-            cursor.execute("SELECT task FROM task_statements WHERE task_id = ?", (t_id,))
-            row = cursor.fetchone()
-            translated["tasks"].append(row[0] if row else t_id)
-        for d_id in master_profile.get("dwas", []):
+            try:
+                # Find the parent DWA for this specific task
+                cursor.execute("SELECT dwa_id FROM tasks_to_dwas WHERE task_id = ? LIMIT 1", (t_id,))
+                row = cursor.fetchone()
+                if row and row[0]:
+                    rolled_up_dwas.add(row[0])  # Escalate task to DWA!
+                else:
+                    unlinked_tasks.append(t_id)  # No DWA linkage, keep as granular task
+            except sqlite3.Error:
+                unlinked_tasks.append(t_id)
+
+        # 2. Translate the combined DWAs
+        for d_id in rolled_up_dwas:
             cursor.execute("SELECT dwa_title FROM dwa_reference WHERE dwa_id = ?", (d_id,))
             row = cursor.fetchone()
-            translated["dwas"].append(row[0] if row else d_id)
+            translated["dwas"].append(row[0] if row else str(d_id))
+
+        # 3. Translate remaining unlinked Tasks
+        for t_id in unlinked_tasks:
+            cursor.execute("SELECT task FROM task_statements WHERE task_id = ?", (t_id,))
+            row = cursor.fetchone()
+            translated["tasks"].append(row[0] if row else str(t_id))
+
+        # 4. Translate Skills
         for s_id in master_profile.get("skills", []):
             cursor.execute("SELECT element_name FROM skills WHERE element_id = ?", (s_id,))
             row = cursor.fetchone()
-            translated["skills"].append(row[0] if row else s_id)
+            translated["skills"].append(row[0] if row else str(s_id))
         conn.close()
+
     except Exception as e:
         print(f"[X] Translation Error: {e}")
         translated["tasks"] = master_profile.get("tasks", [])
         translated["dwas"] = master_profile.get("dwas", [])
         translated["skills"] = master_profile.get("skills", [])
 
-    translated["tech_skills"] = [tech.replace("TECH-", "") for tech in master_profile.get("tech_skills", [])]
+    translated["tech_skills"] = [str(tech).replace("TECH-", "") for tech in master_profile.get("tech_skills", [])]
     return translated
 
 
@@ -105,23 +129,38 @@ def execute_mentor(state: CArcState, llm) -> dict:
 
     elif mode == "counselor":
         system_prompt = (
-            "You are the C-Arc Career Counselor. Phase 1 is complete. "
-            "Your role is to review ML predictions and provide empathetic, action-oriented coaching.\n"
-            "CRITICAL: Act like a real human mentor. Keep your conversational responses highly concise "
-            "(under 3 sentences) unless you are explicitly formatting and delivering the final recommendation list. "
-            "Never output your internal thinking process. Output ONLY the final response."
+            "You are the C-Arc Career Counselor, an expert, empathetic, and practical career mentor.\n"
+            "Phase 1 (Discovery) is complete. You are now in Phase 2 (Counseling) helping the candidate navigate their ML-generated career matches.\n\n"
+            "CORE DIRECTIVES:\n"
+            "1. THE BOUNDARY: You MUST ground every piece of advice, skill gap analysis, and mock interview question STRICTLY in the candidate's specific XGBoost career matches. Never suggest alternative career paths.\n"
+            "2. THE PERSONA: Speak like a real human mentor in a chat app. Be warm, encouraging, and direct.\n"
+            "3. THE FORMAT: Keep responses highly concise and conversational (2-4 short sentences). Avoid robotic AI transitions, bulleted lists, or long essays unless the user explicitly asks for detailed formatting.\n"
+            "4. THE GOAL: Answer the user's immediate question, then help them take actionable steps (e.g., preparing for the resume generator, interview prep) for their chosen path.\n\n"
+            "Never output your internal thinking process. Output ONLY your direct dialogue."
         )
 
-        # Inject the XGBoost results ONLY if they haven't been delivered yet
-        if final_recs and "Match Score:" not in chat_history:
+        # Safely extract the content of the very last message in the conversation
+        last_msg_content = ""
+        if messages:
+            last_msg = messages[-1]
+            last_msg_content = last_msg.get("content", "") if isinstance(last_msg, dict) else getattr(last_msg, 'content', "")
+
+        # Initial Delivery: The Big Reveal
+        if final_recs and "Profile Confirmed by User" in last_msg_content:
             user_prompt = (
                 f"Conversation History:\n{chat_history}\n\n"
                 f"Our XGBoost ML model generated these top career matches:\n{final_recs}\n\n"
-                f"Please deliver these recommendations to the candidate gracefully and congratulate them."
+                f"This is the big reveal! Congratulate the candidate on completing the profiling phase, gracefully present their top career matches (including scores), and ask them which path catches their eye."
             )
+        # Ongoing Counseling: Dynamic Follow-ups
         else:
-            # For all subsequent turns in Phase 2, act as a standard counselor answering their questions
-            user_prompt = f"Conversation History:\n{chat_history}\n\nPlease continue counseling the candidate."
+            user_prompt = (
+                f"[SYSTEM CONTEXT - DO NOT READ THIS TO THE USER]\n"
+                f"Candidate's Official XGBoost Career Matches:\n{final_recs}\n"
+                f"--------------------------------------------------\n\n"
+                f"Conversation History:\n{chat_history}\n\n"
+                f"Respond directly to the candidate's last message. Keep the conversation flowing naturally while strictly anchoring your advice to the career matches above."
+            )
 
     response = llm.generate(
         system_prompt=system_prompt,
@@ -141,29 +180,44 @@ def execute_mentor(state: CArcState, llm) -> dict:
             # Fallback if no double newline exists: try to split at the last known header
             response = response.split("Construct the Response:")[-1].strip()
 
-    # Manually attach the exact Markdown summary to the final output so the UI displays it perfectly.
+    # Format the Document Panel summary (only during validation)
     if mode == "validation":
         readable_data = translate_onet_ids(master_profile)
-        all_skills = readable_data["skills"] + readable_data["tech_skills"]
-        skills_display = ", ".join(all_skills) if all_skills else "None"
-        all_experience = readable_data["tasks"] + readable_data["dwas"]
-        exp_display = "\n* ".join([""] + all_experience) if all_experience else "None"
+
+        # Combine and format skills as bullets (Eliminates exact string duplicates)
+        all_skills = list(dict.fromkeys(readable_data["skills"] + readable_data["tech_skills"]))
+        skills_display = "\n".join([f"* {s}" for s in all_skills]) if all_skills else "* None"
+
+        # Combine and format DWAs and remaining Tasks as bullets (Eliminates exact string duplicates)
+        all_experience = list(dict.fromkeys(readable_data["dwas"] + readable_data["tasks"]))
+        exp_display = "\n".join([f"* {e}" for e in all_experience]) if all_experience else "* None"
+
+        # Format Education as bullets
+        edu_list = [f"{ed.get('degree') or 'Unknown Degree'} in {ed.get('major') or 'Unknown Major'}" for ed in master_profile.get('education', [])]
+        edu_display = "\n".join([f"* {ed}" for ed in edu_list]) if edu_list else "* Not provided"
 
         profile_summary = (
-            f"### 📋 Your Profile Summary\n"
-            f"**Name:** {master_profile.get('basic_info', {}).get('full_name', 'Not provided')}\n"
-            f"**Location:** {master_profile.get('basic_info', {}).get('location', 'Not provided')}\n"
-            f"**Contact:** {master_profile.get('basic_info', {}).get('email', 'N/A')} | {master_profile.get('basic_info', {}).get('phone', 'N/A')}\n\n"
-            f"**Education:** {', '.join([f['degree'] + ' in ' + f['major'] for f in master_profile.get('education', [])]) if master_profile.get('education') else 'Not provided'}\n\n"
-            f"**Extracted Skills:**\n{skills_display}\n\n"
-            f"**Tracked Work Responsibilities:**{exp_display}\n\n"
+            f"### 📋 Candidate Profile Overview\n\n"
+            f"**Name:** {master_profile.get('basic_info', {}).get('full_name') or 'Not provided'}\n\n"
+            f"**Location:** {master_profile.get('basic_info', {}).get('location') or 'Not provided'}\n\n"
+            f"**Contact:** {master_profile.get('basic_info', {}).get('email') or 'N/A'} | {master_profile.get('basic_info', {}).get('phone') or 'N/A'}\n\n"
+            f"### 🎓 Education\n"
+            f"{edu_display}\n\n"
+            f"### 💻 Technical & Professional Skills\n"
+            f"{skills_display}\n\n"
+            f"### 🏢 Work Responsibilities & Activities\n"
+            f"{exp_display}\n\n"
             f"---\n"
-            f"Please check through these details. If everything is correct and you have no more modifications, "
-            f"please click the **Confirm & Proceed** button below to generate your expert career matches!"
+            f"*Please review these details. If everything is correct, click **Confirm & Proceed** below.*"
         )
 
-        response = f"{response}\n\n{profile_summary}"
+        # Return the chat response normally, but route the summary directly to its specific state variable
+        return {
+            "messages": [{"role": "assistant", "content": response}],
+            "profile_summary": profile_summary
+        }
 
+    # Default return for Interviewer and Counselor modes
     return {
         "messages": [{"role": "assistant", "content": response}]
     }

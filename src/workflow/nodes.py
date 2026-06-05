@@ -1,20 +1,34 @@
-import json
+import os
+import logging
+from dotenv import load_dotenv
+from openai import OpenAI
 from .state import CArcState
 from utils.llm_provider import LocalLLMProvider
-from agents.ir_agent.extractor import IRExtractor
-from agents.ir_agent.mapper import IRMapper
+from agents.info_retrieval.extractor import IRExtractor
+from agents.info_retrieval.mapper import IRMapper
 from agents.career_expert.inference import CareerExpert
 
-from agents.mentor_agent.mentor import execute_mentor
-from agents.profiler_agent.profiler import execute_profiler
-from agents.ir_agent.ir import execute_ir
+from agents.mentor.mentor import execute_mentor
+from agents.profiler.profiler import execute_profiler
+from agents.info_retrieval.ir import execute_ir
 from agents.career_expert.expert import execute_career_expert
-from agents.evaluator_agent.evaluator import execute_evaluator
+from agents.evaluator.evaluator import execute_evaluator
+from agents.resume_generator.generator import generate_resume
 
 # Initialize engines
+logger = logging.getLogger(__name__)
+load_dotenv()
+api_key = os.getenv("DEEPSEEK_API_KEY")
+if not api_key:
+    logger.error("DEEPSEEK_API_KEY not found! Please check your .env file.")
+
+llm_client = OpenAI(
+    api_key=api_key,
+    base_url="https://api.deepseek.com"
+)
 llm = LocalLLMProvider()
-ir_extractor = IRExtractor()
-ir_mapper = IRMapper(db_path="../data_factory/onet.db", pool_dir="../data_factory/artifacts/")
+ir_extractor = IRExtractor(llm_client)
+ir_mapper = IRMapper(llm_client, db_path="../data_factory/onet.db", pool_dir="../data_factory/artifacts/")
 expert_engine = CareerExpert()
 
 
@@ -50,3 +64,7 @@ def evaluator_node(state: CArcState) -> dict:
     turn = state.get("turn_count", 0)
     print(f"\n[➔] STARTING NODE: evaluate_state_node | Turn: {turn}")
     return execute_evaluator(state)
+
+def resume_generator_node(state: CArcState) -> dict:
+    # Pass your initialized DeepSeek client or local LLM here
+    return generate_resume(state, llm_client)
