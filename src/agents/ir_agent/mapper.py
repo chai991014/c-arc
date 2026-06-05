@@ -1,6 +1,9 @@
 import sqlite3
 import json
 import logging
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
 from sentence_transformers import SentenceTransformer, util
 
 logger = logging.getLogger(__name__)
@@ -11,6 +14,17 @@ class IRMapper:
         self.db_path = db_path
         logger.info("Loading sentence-transformers model (all-MiniLM-L6-v2)...")
         self.embed_model = SentenceTransformer('all-MiniLM-L6-v2')
+
+        # Retrieve the API key from your .env file
+        api_key = os.getenv("DEEPSEEK_API_KEY")
+        if not api_key:
+            logger.error("DEEPSEEK_API_KEY not found! Please check your .env file.")
+
+        # DeepSeek's API is natively compatible with the OpenAI Python client
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.deepseek.com"
+        )
 
         # Dictionary to hold the 3 distinct mapping pools
         self.pools = {
@@ -44,37 +58,77 @@ class IRMapper:
             logger.warning(f"Could not find {file_path}. Initializing empty pool for {pool_name}.")
 
     def ground_phrase(self, raw_text: str, entity_type: str) -> dict:
-        """Vector search against the specified JSON pool, followed by SQL lookup."""
+        """Hybrid RAG: Vector search (Top 5) + DeepSeek Reasoning."""
         pool = self.pools.get(entity_type)
         if not pool or pool["embeddings"] is None:
             return {"id": None, "context": None, "score": "N/A (Empty/Invalid Pool)"}
 
+        # 1. Fast Vector Retrieval (Pull Top 5 instead of Top 1)
         query_embedding = self.embed_model.encode(raw_text, convert_to_tensor=True)
-        hits = util.semantic_search(query_embedding, pool["embeddings"], top_k=1)[0]
+        hits = util.semantic_search(query_embedding, pool["embeddings"], top_k=10)[0]
 
         if not hits:
             return {"id": None, "context": None, "score": "N/A (No Hits)"}
 
-        best_match_idx = hits[0]['corpus_id']
-        best_score = float(hits[0]['score'])
-        matched_id = pool["ids"][best_match_idx]
-        matched_text = pool["texts"][best_match_idx]
+        # 2. Build Candidates List
+        candidates = []
+        for hit in hits:
+            idx = hit['corpus_id']
+            candidates.append({
+                "id": pool["ids"][idx],
+                "text": pool["texts"][idx],
+                "score": round(float(hit['score']), 3)
+            })
 
-        # Return the score even if it fails the threshold so we can debug it!
-        if best_score < 0.70:
+        candidates_str = "\n".join([f"- ID: {c['id']} | Description: {c['text']}" for c in candidates])
+
+        print(f"\n[+] DEBUG - IRMapper Vector Retrieval for '{raw_text}' ({entity_type}):")
+        print(candidates_str)
+
+        # 3. LLM Reranking (Using the faster, cheaper chat model)
+        prompt = (
+            f"You are a strict O*NET taxonomy mapper.\n"
+            f"The candidate described this specific {entity_type}: \"{raw_text}\"\n\n"
+            f"Here are the top 10 closest official O*NET matches retrieved from the database:\n{candidates_str}\n\n"
+            f"Which of these 10 options is the most accurate semantic match?\n"
+            f"If none of them accurately represent the candidate's statement, you must output 'NONE'.\n"
+            f"Output strictly the exact 'ID' of the best match or 'NONE'. Do not include any other text."
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.0
+            )
+
+            raw_content = response.choices[0].message.content.strip()
+            print(f"\n[+] DEBUG - IRMapper DeepSeek Decision: {raw_content}")
+
+        except Exception as e:
+            logger.error(f"Hybrid RAG LLM Error: {e}")
+            raw_content = "NONE"
+
+        # 4. Process LLM Decision
+        candidate_ids_as_strings = [str(c['id']) for c in candidates]
+        if raw_content == "NONE" or raw_content not in candidate_ids_as_strings:
+            # LLM rejected all candidates, or hallucinated an ID
+            top_vector = candidates[0]
             return {
                 "id": None,
-                "matched_text": f"[FAILED THRESHOLD] {matched_text}",
-                "score": round(best_score, 3),
+                "matched_text": f"[LLM REJECTED] Top match was: {top_vector['text']}",
+                "score": f"Vector Score was {top_vector['score']}",
                 "context": "N/A"
             }
 
-        context = self._fetch_db_context(matched_id, entity_type)
+        # 5. Hydrate the winning match
+        best_match = next(c for c in candidates if str(c['id']) == raw_content)
+        context = self._fetch_db_context(best_match['id'], entity_type)
 
         return {
-            "id": matched_id,
-            "matched_text": matched_text,
-            "score": round(best_score, 3),
+            "id": best_match['id'],
+            "matched_text": best_match['text'],
+            "score": f"Vector Score: {best_match['score']} (LLM Verified)",
             "context": context
         }
 

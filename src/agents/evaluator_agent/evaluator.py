@@ -2,26 +2,20 @@ import math
 from workflow.state import CArcState
 
 
-def check_signal_strength(ocean_hits: dict, min_total_hits: int = 5) -> bool:
-    """Ensures the LLM has extracted several strong, unambiguous personality signals."""
-    print(f"\n[+] DEBUG - Signal Strength Check:")
-
-    if not ocean_hits:
-        return False
-
-    total_hits = sum(ocean_hits.values())
-    print(f"    -> Trait Hits: {ocean_hits}")
-    print(f"    -> Total Strong Signals: {total_hits} | Threshold: >= {min_total_hits}")
-
-    return total_hits >= min_total_hits
+def get_weak_ocean_traits(trait_maturity: dict, threshold: float = 1.0) -> list[str]:
+    """Returns the weakest OCEAN traits (maturity < 1.0) sorted in ascending order."""
+    traits = ["O", "C", "E", "A", "N"]
+    weak = [t for t in traits if trait_maturity.get(t, 0.0) < threshold]
+    weak.sort(key=lambda t: trait_maturity.get(t, 0.0))
+    return weak[:2]
 
 
-def check_logit_confidence(cumulative_confidence: float, threshold: float = 3.0) -> bool:
-    """Ensures the LLM has maintained high overall certainty across the conversation."""
-    print(f"\n[+] DEBUG - Logit Confidence Check:")
-    print(f"    -> Accumulated Certainty Score: {cumulative_confidence:.3f} | Threshold: >= {threshold}")
-
-    return cumulative_confidence >= threshold
+def check_psychometric_readiness(trait_maturity: dict, overall_threshold: float = 5.0) -> bool:
+    """Ensures the total volume of data collected across all traits is sufficient."""
+    total_maturity = sum(trait_maturity.values())
+    print(f"\n[+] DEBUG - Psychometric Readiness Check:")
+    print(f"    -> Total Data Maturity: {total_maturity:.3f} | Threshold: >= {overall_threshold}")
+    return total_maturity >= overall_threshold
 
 
 def audit_entity_density(master_profile: dict, min_entities: int = 5) -> bool:
@@ -38,20 +32,16 @@ def audit_entity_density(master_profile: dict, min_entities: int = 5) -> bool:
     return total_density >= min_entities
 
 
-def verify_demographic_completeness(master_profile: dict) -> bool:
-    """Strict gate: Enforces that basic info and education are explicitly extracted."""
-    print(f"\n[+] DEBUG - Demographic Completeness Check:")
+def get_missing_demographics(master_profile: dict) -> list[str]:
+    """Returns a list of missing mandatory demographic fields."""
     basic_info = master_profile.get("basic_info", {})
     education = master_profile.get("education", [])
 
-    required_fields = ["full_name", "location", "email", "phone"]
-    missing_fields = [f for f in required_fields if not basic_info.get(f)]
-
+    missing_fields = [f for f in ["full_name", "location", "email", "phone"] if not basic_info.get(f)]
     if not education:
         missing_fields.append("education")
 
-    print(f"    -> Missing Mandatory Fields: {missing_fields if missing_fields else 'NONE'}")
-    return len(missing_fields) == 0
+    return missing_fields
 
 
 def verify_profile_stability(ocean_history: list, threshold: float = 0.1) -> bool:
@@ -91,26 +81,31 @@ def execute_evaluator(state: CArcState) -> dict:
         return {}
 
     master_profile = state.get("master_profile", {})
-    ocean_hits = state.get("ocean_hits", {})
-    cumulative_confidence = state.get("cumulative_confidence", 0.0)
+    trait_maturity = state.get("trait_maturity", {"O": 0.0, "C": 0.0, "E": 0.0, "A": 0.0, "N": 0.0})
     ocean_history = state.get("ocean_history", [])
 
-    has_demographics = verify_demographic_completeness(master_profile)
-    has_strong_signals = check_signal_strength(ocean_hits)
-    has_high_confidence = check_logit_confidence(cumulative_confidence)
+    missing_demo = get_missing_demographics(master_profile)
+    weak_traits = get_weak_ocean_traits(trait_maturity)
+    is_psychometrically_ready = check_psychometric_readiness(trait_maturity)
     has_sufficient_density = audit_entity_density(master_profile)
     is_profile_stable = verify_profile_stability(ocean_history)
 
+    state_update = {
+        "missing_demographics": missing_demo,
+        "weak_ocean_traits": weak_traits
+    }
+
     print("\n[=] Diagnostic Scorecard:")
-    print(f"    -> Profile Completeness : {'PASS' if has_demographics else 'FAIL'}")
-    print(f"    -> Signal Hits (>= 5)   : {'PASS' if has_strong_signals else 'FAIL'}")
-    print(f"    -> High Certainty       : {'PASS' if has_high_confidence else 'FAIL'}")
+    print(f"    -> Missing Demographics : {'PASS' if not missing_demo else missing_demo}")
+    print(f"    -> Targeted Weak Traits : {'PASS' if not weak_traits else weak_traits}")
+    print(f"    -> Psychometric Ready   : {'PASS' if is_psychometrically_ready else 'FAIL'}")
     print(f"    -> Entity Density (>= 5): {'PASS' if has_sufficient_density else 'FAIL'}")
     print(f"    -> Profile Stability    : {'PASS' if is_profile_stable else 'FAIL'}")
 
-    if has_demographics and has_strong_signals and has_high_confidence and has_sufficient_density and is_profile_stable:
+    if not missing_demo and is_psychometrically_ready and has_sufficient_density and is_profile_stable:
         print("    -> ALL CHECKS PASSED! Shifting to Validation Loop.")
-        return {"mentor_mode": "validation"}
+        state_update["mentor_mode"] = "validation"
+        return state_update
 
     print("    -> ROUTING: Diagnostics incomplete. Continuing Phase 1 (Mentor Mode).")
-    return {}
+    return state_update
