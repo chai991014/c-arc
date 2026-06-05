@@ -48,35 +48,43 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
             continue
 
         # Fall back to your legacy O*NET database matching for standard skills/tasks
-        if entity_type not in ["skill", "task", "dwa"]:
+        if entity_type not in ["experience", "skill", "task", "dwa"]:
             continue
 
-        grounded_data = ir_mapper.ground_phrase(value, entity_type)
-        onet_code = grounded_data.get("id")
+        grounded_data_list = ir_mapper.ground_phrase(value, entity_type)
 
-        if not onet_code:
+        if not grounded_data_list:
             continue
 
-        print(f"\n[?] Mapping Attempt for '{value}' ({entity_type}):")
-        print(f"    -> Score: {grounded_data.get('score', 'N/A')}")
-        print(f"    -> Resulting ID: {onet_code}")
+        # Iterate through every valid match the LLM approved
+        for grounded_data in grounded_data_list:
+            onet_code = grounded_data.get("id")
+            resolved_type = grounded_data.get("resolved_type", entity_type)
 
-        # Route the ID to the correct array
-        if entity_type == "task":
-            target_list = updated_profile["tasks"]
-        elif entity_type == "dwa":
-            target_list = updated_profile["dwas"]
-        elif entity_type == "skill":
-            if str(onet_code).startswith("TECH-"):
-                target_list = updated_profile["tech_skills"]
+            if not onet_code:
+                continue
+
+            print(f"\n[?] Mapping Attempt for '{value}':")
+            print(f"    -> Extracted as: {entity_type} | Resolved to: {resolved_type}")
+            print(f"    -> Resulting ID: {onet_code}")
+
+            if resolved_type == "task":
+                target_list = updated_profile["tasks"]
+            elif resolved_type == "dwa":
+                target_list = updated_profile["dwas"]
+            elif resolved_type == "skill":
+                if str(onet_code).startswith("TECH-"):
+                    target_list = updated_profile["tech_skills"]
+                else:
+                    target_list = updated_profile["skills"]
             else:
-                target_list = updated_profile["skills"]
+                continue
 
-        # Conflict Resolution
-        if intent == "ADD" and onet_code not in target_list:
-            target_list.append(onet_code)
-        elif intent == "DELETE" and onet_code in target_list:
-            target_list.remove(onet_code)
+            # Conflict Resolution
+            if intent == "ADD" and onet_code not in target_list:
+                target_list.append(onet_code)
+            elif intent == "DELETE" and onet_code in target_list:
+                target_list.remove(onet_code)
 
     # Cleanly return the reconciled state
     print(f"\n[+] DEBUG - Master Profile Updated: {updated_profile}")

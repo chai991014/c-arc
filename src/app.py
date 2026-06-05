@@ -43,11 +43,28 @@ def handle_profile_confirmation(c_arc_state):
     return c_arc_state["messages"], c_arc_state, gr.update(interactive=False, variant="success")
 
 
+def handle_resume_initiation(c_arc_state):
+    """Triggered when the user clicks the Generate Resume button."""
+    c_arc_state["mentor_mode"] = "generate_resume"
+    c_arc_state["messages"].append({
+        "role": "user",
+        "content": "[Generate Tailored Resume]",
+    })
+    c_arc_state["messages"].append({
+        "role": "assistant",
+        "content": "Awesome! Let's get your resume ready. **Which of the recommended career paths would you like to target?**"
+    })
+    return c_arc_state["messages"], c_arc_state, gr.update(interactive=False)
+
+
 def run_graph(c_arc_state):
     """Executes the LangGraph workflow after the UI has updated."""
     # Prevent running if the last message isn't from the user
     if not c_arc_state["messages"] or c_arc_state["messages"][-1]["role"] != "user":
-        return c_arc_state.get("messages", []), c_arc_state, c_arc_state, gr.update()
+        return (c_arc_state.get("messages", []), c_arc_state, c_arc_state, gr.update(), gr.update(),
+                c_arc_state.get("profile_summary", "*Your profile summary will appear here during validation.*"),
+                c_arc_state.get("final_recommendations", "*Your XGBoost career matches will appear here.*"),
+                c_arc_state.get("resume_content", "*Your tailored resume will appear here after generation.*"))
 
     config = {"recursion_limit": 15}
 
@@ -67,19 +84,30 @@ def run_graph(c_arc_state):
                         c_arc_state[key] = val
 
         is_validating = (c_arc_state.get("mentor_mode") == "validation")
+        is_counselor = (c_arc_state.get("mentor_mode") == "counselor")
 
         if is_validating:
             button_update = gr.update(interactive=True, variant="primary")
         else:
             button_update = gr.update(interactive=False, variant="success")
 
-        return c_arc_state["messages"], c_arc_state, c_arc_state, button_update
+        if is_counselor:
+            resume_btn_update = gr.update(interactive=True, variant="primary")
+        else:
+            resume_btn_update = gr.update(interactive=False, variant="success")
+
+        current_profile = c_arc_state.get("profile_summary", "*Your profile summary will appear here during validation.*")
+        current_recs = c_arc_state.get("final_recommendations", "*Your XGBoost career matches will appear here.*")
+        current_resume = c_arc_state.get("resume_content", "*Your tailored resume will appear here after generation.*")
+
+        return c_arc_state["messages"], c_arc_state, c_arc_state, button_update, resume_btn_update, current_profile, current_recs, current_resume
 
     except Exception as e:
         import traceback
         error_msg = f"❌ Execution crashed:\n{traceback.format_exc()}"
         c_arc_state["messages"].append({"role": "assistant", "content": error_msg})
-        return c_arc_state["messages"], c_arc_state, c_arc_state, gr.update(interactive=False)
+        return (c_arc_state["messages"], c_arc_state, c_arc_state, gr.update(interactive=False), gr.update(interactive=False),
+                c_arc_state.get("profile_summary", ""), c_arc_state.get("final_recommendations", ""), c_arc_state.get("resume_content", ""))
 
 # Define the Gradio Interface
 with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
@@ -126,6 +154,14 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
                     scale=4
                 )
                 submit_btn = gr.Button("Send", scale=1, variant="primary")
+            gr.Markdown("---")
+            with gr.Tabs():
+                with gr.Tab("📋 Profile Summary"):
+                    profile_display = gr.Markdown(value="*Your profile summary will appear here during validation.*")
+                with gr.Tab("🎯 Career Matches"):
+                    recommendations_display = gr.Markdown(value="*Your XGBoost career matches will appear here.*")
+                with gr.Tab("📄 Tailored Resume"):
+                    resume_display = gr.Markdown(value="*Your tailored resume will appear here after generation.*")
 
         # Telemetry & State Column
         with gr.Column(scale=1):
@@ -135,11 +171,17 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
                 label="Global C-Arc State (Debug)"
             )
 
-            # Optional button to reset the state without restarting the server
             clear_btn = gr.Button("Reset Conversation")
 
             confirm_profile_btn = gr.Button(
                 "✅ Confirm & Proceed to Career Recommendations",
+                variant="success",
+                interactive=False,
+                visible=True
+            )
+
+            generate_resume_btn = gr.Button(
+                "📄 Generate Tailored Resume",
                 variant="success",
                 interactive=False,
                 visible=True
@@ -185,7 +227,8 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, state_display, confirm_profile_btn]
+        outputs=[chatbot, initial_state, state_display, confirm_profile_btn, generate_resume_btn,
+                 profile_display, recommendations_display, resume_display]
     )
 
     submit_btn.click(
@@ -195,7 +238,8 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, state_display, confirm_profile_btn]
+        outputs=[chatbot, initial_state, state_display, confirm_profile_btn, generate_resume_btn,
+                 profile_display, recommendations_display, resume_display]
     )
 
     confirm_profile_btn.click(
@@ -205,7 +249,14 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, state_display, confirm_profile_btn]
+        outputs=[chatbot, initial_state, state_display, confirm_profile_btn, generate_resume_btn,
+                 profile_display, recommendations_display, resume_display]
+    )
+
+    generate_resume_btn.click(
+        handle_resume_initiation,
+        inputs=[initial_state],
+        outputs=[chatbot, initial_state, generate_resume_btn]
     )
 
 if __name__ == "__main__":

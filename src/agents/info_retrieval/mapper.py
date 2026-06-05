@@ -1,30 +1,18 @@
 import sqlite3
 import json
 import logging
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
 from sentence_transformers import SentenceTransformer, util
 
 logger = logging.getLogger(__name__)
 
 
 class IRMapper:
-    def __init__(self, db_path: str = "../data_factory/onet.db", pool_dir: str = "../data_factory/artifacts/"):
+    def __init__(self, llm_client, db_path: str = "../data_factory/onet.db", pool_dir: str = "../data_factory/artifacts/"):
         self.db_path = db_path
         logger.info("Loading sentence-transformers model (all-MiniLM-L6-v2)...")
         self.embed_model = SentenceTransformer('all-MiniLM-L6-v2')
 
-        # Retrieve the API key from your .env file
-        api_key = os.getenv("DEEPSEEK_API_KEY")
-        if not api_key:
-            logger.error("DEEPSEEK_API_KEY not found! Please check your .env file.")
-
-        # DeepSeek's API is natively compatible with the OpenAI Python client
-        self.client = OpenAI(
-            api_key=api_key,
-            base_url="https://api.deepseek.com"
-        )
+        self.client = llm_client
 
         # Dictionary to hold the 3 distinct mapping pools
         self.pools = {
@@ -58,41 +46,49 @@ class IRMapper:
             logger.warning(f"Could not find {file_path}. Initializing empty pool for {pool_name}.")
 
     def ground_phrase(self, raw_text: str, entity_type: str) -> dict:
-        """Hybrid RAG: Vector search (Top 5) + DeepSeek Reasoning."""
-        pool = self.pools.get(entity_type)
-        if not pool or pool["embeddings"] is None:
-            return {"id": None, "context": None, "score": "N/A (Empty/Invalid Pool)"}
+        """Global Hybrid RAG: Searches Skills, Tasks, and DWAs simultaneously."""
 
-        # 1. Fast Vector Retrieval (Pull Top 5 instead of Top 1)
+        all_candidates = []
         query_embedding = self.embed_model.encode(raw_text, convert_to_tensor=True)
-        hits = util.semantic_search(query_embedding, pool["embeddings"], top_k=10)[0]
 
-        if not hits:
-            return {"id": None, "context": None, "score": "N/A (No Hits)"}
+        pools_to_search = ["skill", "task", "dwa"] if entity_type == "experience" else [entity_type]
 
-        # 2. Build Candidates List
-        candidates = []
-        for hit in hits:
-            idx = hit['corpus_id']
-            candidates.append({
-                "id": pool["ids"][idx],
-                "text": pool["texts"][idx],
-                "score": round(float(hit['score']), 3)
-            })
+        for pool_name in pools_to_search:
+            pool = self.pools.get(pool_name)
+            if not pool or pool["embeddings"] is None:
+                continue
 
-        candidates_str = "\n".join([f"- ID: {c['id']} | Description: {c['text']}" for c in candidates])
+            hits = util.semantic_search(query_embedding, pool["embeddings"], top_k=5)[0]
+            for hit in hits:
+                idx = hit['corpus_id']
+                all_candidates.append({
+                    "id": pool["ids"][idx],
+                    "text": pool["texts"][idx],
+                    "score": round(float(hit['score']), 3),
+                    "resolved_type": pool_name  # Track which pool this candidate came from
+                })
 
-        print(f"\n[+] DEBUG - IRMapper Vector Retrieval for '{raw_text}' ({entity_type}):")
+        if not all_candidates:
+            return {"id": None, "context": None, "score": "N/A (No Hits)", "resolved_type": None}
+
+        all_candidates = sorted(all_candidates, key=lambda x: x['score'], reverse=True)[:10]
+
+        candidates_str = "\n".join(
+            [f"- ID: {c['id']} | Type: [{c['resolved_type'].upper()}] | Description: {c['text']}" for c in
+             all_candidates])
+
+        print(f"\n[+] DEBUG - IRMapper GLOBAL Vector Retrieval for '{raw_text}':")
         print(candidates_str)
 
-        # 3. LLM Reranking (Using the faster, cheaper chat model)
+        # 3. LLM Reranking
         prompt = (
             f"You are a strict O*NET taxonomy mapper.\n"
-            f"The candidate described this specific {entity_type}: \"{raw_text}\"\n\n"
-            f"Here are the top 10 closest official O*NET matches retrieved from the database:\n{candidates_str}\n\n"
-            f"Which of these 10 options is the most accurate semantic match?\n"
-            f"If none of them accurately represent the candidate's statement, you must output 'NONE'.\n"
-            f"Output strictly the exact 'ID' of the best match or 'NONE'. Do not include any other text."
+            f"The candidate described this professional experience: \"{raw_text}\"\n\n"
+            f"Here are the top 10 closest official O*NET matches retrieved across all databases:\n{candidates_str}\n\n"
+            f"A single candidate statement might contain multiple distinct skills or tasks (e.g., 'Wrote Python scripts for data analysis' = Python AND Data Analysis).\n"
+            f"Select ALL options from the top 10 that accurately map to distinct components of the candidate's statement.\n"
+            f"If none of them accurately represent the candidate's statement, output [\"NONE\"].\n"
+            f"Output STRICTLY a valid JSON list of strings containing the exact 'ID's of the best matches. Do not include any other text or markdown."
         )
 
         try:
@@ -105,32 +101,41 @@ class IRMapper:
             raw_content = response.choices[0].message.content.strip()
             print(f"\n[+] DEBUG - IRMapper DeepSeek Decision: {raw_content}")
 
+            # Clean markdown if present
+            if raw_content.startswith("```json"):
+                raw_content = raw_content.replace("```json", "").replace("```", "").strip()
+            elif raw_content.startswith("```"):
+                raw_content = raw_content.replace("```", "").strip()
+
+            matched_ids = json.loads(raw_content)
+            print(f"\n[+] DEBUG - IRMapper DeepSeek Multi-Decision: {matched_ids}")
+
         except Exception as e:
-            logger.error(f"Hybrid RAG LLM Error: {e}")
-            raw_content = "NONE"
+            logger.error(f"Hybrid RAG LLM Error or JSON parse failure: {e}")
+            matched_ids = []
 
-        # 4. Process LLM Decision
-        candidate_ids_as_strings = [str(c['id']) for c in candidates]
-        if raw_content == "NONE" or raw_content not in candidate_ids_as_strings:
-            # LLM rejected all candidates, or hallucinated an ID
-            top_vector = candidates[0]
-            return {
-                "id": None,
-                "matched_text": f"[LLM REJECTED] Top match was: {top_vector['text']}",
-                "score": f"Vector Score was {top_vector['score']}",
-                "context": "N/A"
-            }
+        candidate_ids_as_strings = [str(c['id']) for c in all_candidates]
+        final_results = []
 
-        # 5. Hydrate the winning match
-        best_match = next(c for c in candidates if str(c['id']) == raw_content)
-        context = self._fetch_db_context(best_match['id'], entity_type)
+        if not isinstance(matched_ids, list):
+            matched_ids = []
 
-        return {
-            "id": best_match['id'],
-            "matched_text": best_match['text'],
-            "score": f"Vector Score: {best_match['score']} (LLM Verified)",
-            "context": context
-        }
+        for m_id in matched_ids:
+            if m_id == "NONE" or m_id not in candidate_ids_as_strings:
+                continue
+
+            best_match = next(c for c in all_candidates if str(c['id']) == m_id)
+            context = self._fetch_db_context(best_match['id'], best_match['resolved_type'])
+
+            final_results.append({
+                "id": best_match['id'],
+                "matched_text": best_match['text'],
+                "score": f"Vector Score: {best_match['score']} (LLM Verified)",
+                "context": context,
+                "resolved_type": best_match['resolved_type']
+            })
+
+        return final_results
 
     def _fetch_db_context(self, element_id: str, entity_type: str) -> str:
         """Fetches the official element name or description from the appropriate O*NET table."""

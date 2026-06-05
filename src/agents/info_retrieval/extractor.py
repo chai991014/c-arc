@@ -1,27 +1,12 @@
-import os
 import json
 import logging
-from dotenv import load_dotenv
-from openai import OpenAI
 
 logger = logging.getLogger(__name__)
 
-# Load environment variables from the .env file in your root directory
-load_dotenv()
-
 
 class IRExtractor:
-    def __init__(self):
-        # Retrieve the API key from your .env file
-        api_key = os.getenv("DEEPSEEK_API_KEY")
-        if not api_key:
-            logger.error("DEEPSEEK_API_KEY not found! Please check your .env file.")
-
-        # DeepSeek's API is natively compatible with the OpenAI Python client
-        self.client = OpenAI(
-            api_key=api_key,
-            base_url="https://api.deepseek.com"
-        )
+    def __init__(self, llm_client):
+        self.client = llm_client
 
     def extract_intents(self, dialogue_history: list) -> list[dict]:
         """
@@ -32,22 +17,22 @@ class IRExtractor:
             "and extract professional competencies, work experience, and candidate demographics to construct a resume profile.\n\n"
 
             "Categorize every extracted entity into exactly one of these types:\n"
-            "1. 'skill' - Core professional capabilities or tools (e.g., 'Python', 'Machine learning').\n"
-            "2. 'task' - Highly specific job duties or project achievements (e.g., 'Developed a RAG system').\n"
-            "3. 'dwa' - Generalized transferable work activities (e.g., 'Analyze data to identify trends').\n"
-            "4. 'basic_info' - Candidate personal metadata. Return a dictionary containing keys: 'full_name', 'email', 'phone', 'location'.\n"
-            "5. 'education' - Academic achievements. Return a dictionary containing keys: 'degree', 'major', 'institution', 'grad_year'.\n\n"
+            "1. 'experience' - ANY professional capability, tool, specific job duty, project achievement, or generalized work activity.\n"
+            "2. 'basic_info' - Candidate personal metadata. Return a dictionary containing keys: 'full_name', 'email', 'phone', 'location'.\n"
+            "3. 'education' - Academic achievements. Return a dictionary containing keys: 'degree', 'major', 'institution', 'grad_year'.\n\n"
 
             "Rules:\n"
             "- Use intent 'ADD' for newly mentioned details, or 'DELETE' if the user corrects/removes info.\n"
             "- For 'basic_info' and 'education', only capture fields explicitly stated by the user. Leave missing keys as null.\n"
+            "- Keep 'experience' values concise (under 8 words if possible).\n"
             "- Output your final answer STRICTLY as a valid JSON list of objects. No thinking process, no markdown wrappers outside the json block.\n\n"
 
             "CRITICAL OUTPUT FORMAT EXAMPLE:\n"
             "[\n"
             "    {\"intent\": \"ADD\", \"type\": \"basic_info\", \"value\": {\"full_name\": \"JY\", \"location\": \"Cheras, Malaysia\", \"email\": null, \"phone\": null}},\n"
             "    {\"intent\": \"ADD\", \"type\": \"education\", \"value\": {\"degree\": \"Master\", \"major\": \"AI\", \"institution\": \"UM\", \"grad_year\": 2026}},\n"
-            "    {\"intent\": \"ADD\", \"type\": \"skill\", \"value\": \"Python\"}\n"
+            "    {\"intent\": \"ADD\", \"type\": \"experience\", \"value\": \"Python development\"},\n"
+            "    {\"intent\": \"ADD\", \"type\": \"experience\", \"value\": \"Analyzed system architecture\"}\n"
             "]"
         )
 

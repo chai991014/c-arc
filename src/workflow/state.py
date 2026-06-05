@@ -34,3 +34,12 @@ class CArcState(TypedDict, total=False):
     weak_ocean_traits: list[str]
 
     ir_last_extracted_index: int
+
+    # Stores the formatted profile overview for the UI
+    profile_summary: str
+
+    # Tracks the specific job title the user wants to build the resume for
+    target_career: str
+
+    # Stores the generated Markdown resume
+    resume_content: str
