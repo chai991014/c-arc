@@ -47,7 +47,7 @@ def run_graph(c_arc_state):
     """Executes the LangGraph workflow after the UI has updated."""
     # Prevent running if the last message isn't from the user
     if not c_arc_state["messages"] or c_arc_state["messages"][-1]["role"] != "user":
-        return c_arc_state.get("messages", []), c_arc_state, c_arc_state.get("ocean_vector", {})
+        return c_arc_state.get("messages", []), c_arc_state, c_arc_state, gr.update()
 
     config = {"recursion_limit": 15}
 
@@ -58,42 +58,28 @@ def run_graph(c_arc_state):
                 if not state_update:
                     continue
 
-                if "messages" in state_update and state_update['messages']:
-                    last_msg = state_update['messages'][-1]
-                    if last_msg['role'] == 'assistant':
-                        c_arc_state["messages"].append(last_msg)
-
-                if "ocean_vector" in state_update:
-                    c_arc_state["ocean_vector"] = state_update["ocean_vector"]
-                if "ocean_history" in state_update:
-                    c_arc_state["ocean_history"] = state_update["ocean_history"]
-                if "ocean_hits" in state_update:
-                    c_arc_state["ocean_hits"] = state_update["ocean_hits"]
-                if "cumulative_confidence" in state_update:
-                    c_arc_state["cumulative_confidence"] = state_update["cumulative_confidence"]
-                if "master_profile" in state_update:
-                    c_arc_state["master_profile"] = state_update["master_profile"]
-                if "mentor_mode" in state_update:
-                    c_arc_state["mentor_mode"] = state_update["mentor_mode"]
-                if "final_recommendations" in state_update:
-                    c_arc_state["final_recommendations"] = state_update["final_recommendations"]
+                for key, val in state_update.items():
+                    if key == "messages" and val:
+                        last_msg = val[-1]
+                        if last_msg['role'] == 'assistant':
+                            c_arc_state["messages"].append(last_msg)
+                    elif key != "messages":
+                        c_arc_state[key] = val
 
         is_validating = (c_arc_state.get("mentor_mode") == "validation")
-        print(f"\n[DEBUG UI] Mentor Mode: '{c_arc_state.get('mentor_mode')}' | Showing Button: {is_validating}")
 
         if is_validating:
             button_update = gr.update(interactive=True, variant="primary")
         else:
             button_update = gr.update(interactive=False, variant="success")
 
-        return c_arc_state["messages"], c_arc_state, c_arc_state["ocean_vector"], button_update
+        return c_arc_state["messages"], c_arc_state, c_arc_state, button_update
 
     except Exception as e:
         import traceback
         error_msg = f"❌ Execution crashed:\n{traceback.format_exc()}"
         c_arc_state["messages"].append({"role": "assistant", "content": error_msg})
-        return c_arc_state["messages"], c_arc_state, c_arc_state.get("ocean_vector", {}), gr.update(interactive=False)
-
+        return c_arc_state["messages"], c_arc_state, c_arc_state, gr.update(interactive=False)
 
 # Define the Gradio Interface
 with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
@@ -117,11 +103,13 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
         },
         "ocean_vector": {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5},
         "ocean_history": [],
-        "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},
-        "cumulative_confidence": 0.0,
+        "trait_maturity": {"O": 0.0, "C": 0.0, "E": 0.0, "A": 0.0, "N": 0.0},
         "turn_count": 0,
         "mentor_mode": "interviewer",
-        "profile_verified": False
+        "profile_verified": False,
+        "missing_demographics": [],
+        "weak_ocean_traits": [],
+        "ir_last_extracted_index": 0,
     })
 
     with gr.Row():
@@ -142,9 +130,9 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
         # Telemetry & State Column
         with gr.Column(scale=1):
             gr.Markdown("### Live Telemetry")
-            ocean_display = gr.JSON(
-                value={"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5},
-                label="DeepSeek Profiler (OCEAN)"
+            state_display = gr.JSON(
+                value=initial_state.value,
+                label="Global C-Arc State (Debug)"
             )
 
             # Optional button to reset the state without restarting the server
@@ -176,16 +164,18 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
                     },
                     "ocean_vector": {"O": 0.5, "C": 0.5, "E": 0.5, "A": 0.5, "N": 0.5},
                     "ocean_history": [],
-                    "ocean_hits": {"O": 0, "C": 0, "E": 0, "A": 0, "N": 0},
-                    "cumulative_confidence": 0.0,
+                    "trait_maturity": {"O": 0.0, "C": 0.0, "E": 0.0, "A": 0.0, "N": 0.0},
                     "turn_count": 0,
                     "mentor_mode": "interviewer",
-                    "profile_verified": False
+                    "profile_verified": False,
+                    "missing_demographics": [],
+                    "weak_ocean_traits": [],
+                    "ir_last_extracted_index": 0,
                 }
-                return fresh_state["messages"], fresh_state, fresh_state["ocean_vector"]
+                return fresh_state["messages"], fresh_state, fresh_state
 
 
-            clear_btn.click(reset_state, inputs=[], outputs=[chatbot, initial_state, ocean_display])
+            clear_btn.click(reset_state, inputs=[], outputs=[chatbot, initial_state, state_display])
 
     # Wire up the text box
     msg.submit(
@@ -195,7 +185,7 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, ocean_display, confirm_profile_btn]
+        outputs=[chatbot, initial_state, state_display, confirm_profile_btn]
     )
 
     submit_btn.click(
@@ -205,7 +195,7 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, ocean_display, confirm_profile_btn]
+        outputs=[chatbot, initial_state, state_display, confirm_profile_btn]
     )
 
     confirm_profile_btn.click(
@@ -215,7 +205,7 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
     ).then(
         run_graph,
         inputs=[initial_state],
-        outputs=[chatbot, initial_state, ocean_display, confirm_profile_btn]
+        outputs=[chatbot, initial_state, state_display, confirm_profile_btn]
     )
 
 if __name__ == "__main__":

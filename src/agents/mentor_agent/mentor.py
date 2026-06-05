@@ -44,24 +44,7 @@ def execute_mentor(state: CArcState, llm) -> dict:
 
     mode = state.get("mentor_mode", "interviewer")  # Default Phase 1 mode
     final_recs = state.get("final_recommendations", "")
-
     master_profile = state.get("master_profile") or {}
-    basic_info = master_profile.get("basic_info", {})
-    education = master_profile.get("education", [])
-
-    missing_items = []
-    if not basic_info.get("full_name"): missing_items.append("their full name")
-    if not basic_info.get("location"): missing_items.append("their current location (city/country)")
-    if not basic_info.get("email"): missing_items.append("their email address")
-    if not basic_info.get("phone"): missing_items.append("their contact phone number")
-    if not education: missing_items.append("their educational background (degree/major/institution)")
-
-    demographic_guidance = ""
-    if missing_items:
-        demographic_guidance = f"""
-        Mandatory fields still missing from candidate's resume profile: {', '.join(missing_items)}.
-        Prioritize gently asking for these missing details naturally within your response.
-        """
 
     if mode == "interviewer":
         system_prompt = (
@@ -74,7 +57,41 @@ def execute_mentor(state: CArcState, llm) -> dict:
             "Limit your replies to 2-3 short sentences. Never write long paragraphs or monologues. "
             "Never output your internal thinking process. Output ONLY your direct dialogue."
         )
-        user_prompt = f"User Profile: OCEAN={ocean}. Turn={turn}.{demographic_guidance}\n\nConversation History:\n{chat_history}\n\nPlease respond to the candidate's last message."
+
+        missing_demo = state.get("missing_demographics", [])
+        weak_traits = state.get("weak_ocean_traits", [])
+
+        steering_directive = ""
+
+        # Priority 0 (The Icebreaker) ---
+        if turn <= 1:
+            steering_directive = "\n- [STARTING TOPIC]: This is the beginning of the interview. Warmly ask the candidate to provide a simple self-introduction to get things started."
+
+        # Priority 1: Secure mandatory demographics
+        if missing_demo:
+            steering_directive = f"\n- [URGENT MISSION]: You must ask the user to provide their missing profile information: {', '.join(missing_demo)}."
+
+        # Priority 2: If demographics are complete, target the single weakest OCEAN trait
+        elif weak_traits:
+            trait_translations = {
+                "O": "openness: adaptability to new ideas, technical curiosity, and creative problem solving",
+                "C": "conscientiousness: attention to detail, organization, and project execution",
+                "E": "extraversion: communication style, teamwork, and leadership dynamics",
+                "A": "agreeableness: empathy, conflict resolution, and cross-functional collaboration",
+                "N": "neuroticism: stress management, handling high-pressure deadlines, and resilience"
+            }
+
+            # Grab the absolute lowest trait (index 0) from the sorted array
+            lowest_trait = weak_traits[0]
+            probe = trait_translations.get(lowest_trait, "general work experience")
+            steering_directive = f"\n- [FOCUS TOPIC]: To better evaluate their personality, steer the conversation to explore their {probe}. Ask a natural interview question about this."
+
+        user_prompt = f"User Profile: OCEAN={ocean}. Turn={turn}."
+        if steering_directive:
+            user_prompt += f"\n\nSYSTEM DIRECTIVES:{steering_directive}"
+
+        user_prompt += f"\n\nConversation History:\n{chat_history}\n\nPlease respond to the candidate's last message."
+
 
     elif mode == "validation":
         system_prompt = (

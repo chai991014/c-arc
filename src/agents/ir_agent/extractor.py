@@ -52,7 +52,7 @@ class IRExtractor:
         )
 
         # Look at the most recent context to save tokens
-        recent_context = dialogue_history[-4:] if len(dialogue_history) >= 4 else dialogue_history
+        recent_context = dialogue_history
         user_text = "\n".join([
             f"{msg.get('role', 'unknown') if isinstance(msg, dict) else msg.type}: "
             f"{msg.get('content', '') if isinstance(msg, dict) else msg.content}"

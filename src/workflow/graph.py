@@ -4,7 +4,7 @@ from .nodes import mentor_node, profiler_node, ir_node, career_expert_node, eval
 
 IR_TURN = 2
 PROFILER_TURN = 2
-EVALUATOR_TURN = 4
+EVALUATOR_TURN = 2
 
 
 def dispatch_workers(state: CArcState) -> str:
@@ -20,6 +20,10 @@ def dispatch_workers(state: CArcState) -> str:
         else:
             print("    -> Enter validation loop.")
             return "profiler"
+
+    if state.get("missing_demographics"):
+        print("    -> Missing demographics active. Forcing Extraction Chain.")
+        return "ir_extractor"
 
     turn = state.get("turn_count", 0)
 
@@ -52,6 +56,8 @@ def ir_post_router(state: CArcState) -> str:
     """Routes after the IR Extractor finishes."""
     if state.get("mentor_mode") == "validation":
         return "mentor"
+    if state.get("missing_demographics"):
+        return "evaluator_agent"
     turn = state.get("turn_count", 0)
     # Check if we hit the 10-turn milestone
     if turn > 0 and turn % EVALUATOR_TURN == 0:

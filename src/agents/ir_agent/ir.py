@@ -2,6 +2,8 @@ from workflow.state import CArcState
 
 def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
     messages = state.get("messages", [])
+    last_extracted_idx = state.get("ir_last_extracted_index", 0)
+    unextracted_messages = messages[last_extracted_idx:]
 
     # Initialize the 4-part profile structure if it doesn't exist
     current_profile = state.get("master_profile", {})
@@ -14,15 +16,16 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
         "education": list(current_profile.get("education", []))
     }
 
-    if not messages:
+    if not unextracted_messages:
+        print(f"    -> [DEBUG IR] No new messages to extract. Skipping API call.")
         return {}
 
-    extracted_changes = ir_extractor.extract_intents(messages)
+    extracted_changes = ir_extractor.extract_intents(unextracted_messages)
 
     if not extracted_changes:
         print(f"    -> No entities extracted on this turn. Preserving profile history.")
         print(f"\n[+] DEBUG - Master Profile Updated: {updated_profile}")
-        return {}
+        return {"ir_last_extracted_index": len(messages)}
 
     for change in extracted_changes:
         intent = change.get("intent")
@@ -78,5 +81,6 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
     # Cleanly return the reconciled state
     print(f"\n[+] DEBUG - Master Profile Updated: {updated_profile}")
     return {
-        "master_profile": updated_profile
+        "master_profile": updated_profile,
+        "ir_last_extracted_index": len(messages)
     }
