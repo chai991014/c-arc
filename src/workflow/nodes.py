@@ -65,6 +65,7 @@ def evaluator_node(state: CArcState) -> dict:
     print(f"\n[➔] STARTING NODE: evaluate_state_node | Turn: {turn}")
     return execute_evaluator(state)
 
+
 def resume_generator_node(state: CArcState) -> dict:
     # Pass your initialized DeepSeek client or local LLM here
     return generate_resume(state, llm_client)
