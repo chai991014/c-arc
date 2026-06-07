@@ -8,24 +8,17 @@ def execute_career_expert(state: CArcState, expert_engine) -> dict:
 
     # 2. Format it for XGBoost (0 - 100 scale, full word keys expected by inference.py)
     formatted_ocean = {
-        "openness": state_ocean.get("O", 0.5) * 100,
-        "conscientiousness": state_ocean.get("C", 0.5) * 100,
-        "extraversion": state_ocean.get("E", 0.5) * 100,
-        "agreeableness": state_ocean.get("A", 0.5) * 100,
-        "neuroticism": state_ocean.get("N", 0.5) * 100
+        "OCEAN_O": float(state_ocean.get("O", 0.5)),
+        "OCEAN_C": float(state_ocean.get("C", 0.5)),
+        "OCEAN_E": float(state_ocean.get("E", 0.5)),
+        "OCEAN_A": float(state_ocean.get("A", 0.5)),
+        "OCEAN_N": float(state_ocean.get("N", 0.5))
     }
 
-    # 3. Extract the 4 professional arrays
-    user_tasks = master_profile.get("tasks", [])
-    user_dwas = master_profile.get("dwas", [])
-    user_skills = master_profile.get("skills", [])
-    user_tech = master_profile.get("tech_skills", [])
-
     try:
-        # Pass all dimensions and the formatted OCEAN vector to the model
-        predictions = expert_engine.predict(
-            user_tasks, user_dwas, user_skills, user_tech, formatted_ocean
-        )
+        # Pass the full master_profile and normalized OCEAN vector directly
+        predictions = expert_engine.predict(master_profile, formatted_ocean)
+
     except Exception as e:
         print(f"[X] XGBoost Inference crashed: {e}")
         predictions = []

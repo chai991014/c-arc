@@ -14,16 +14,19 @@ class IRMapper:
 
         self.client = llm_client
 
-        # Dictionary to hold the 3 distinct mapping pools
         self.pools = {
             "skill": {"ids": [], "texts": [], "embeddings": None},
             "task": {"ids": [], "texts": [], "embeddings": None},
-            "dwa": {"ids": [], "texts": [], "embeddings": None}
+            "dwa": {"ids": [], "texts": [], "embeddings": None},
+            "wa": {"ids": [], "texts": [], "embeddings": None},
+            "tech": {"ids": [], "texts": [], "embeddings": None}
         }
 
         self._load_pool("skill", f"{pool_dir}skill_pool.json")
         self._load_pool("task", f"{pool_dir}task_pool.json")
         self._load_pool("dwa", f"{pool_dir}dwa_pool.json")
+        self._load_pool("wa", f"{pool_dir}wa_pool.json")
+        self._load_pool("tech", f"{pool_dir}tech_pool.json")
 
     def _load_pool(self, pool_name: str, file_path: str):
         """Loads a JSON artifact and encodes it into VRAM."""
@@ -46,12 +49,15 @@ class IRMapper:
             logger.warning(f"Could not find {file_path}. Initializing empty pool for {pool_name}.")
 
     def ground_phrase(self, raw_text: str, entity_type: str) -> dict:
-        """Global Hybrid RAG: Searches Skills, Tasks, and DWAs simultaneously."""
+        """Global Hybrid RAG: Searches Skills, Tasks, DWAs, WAs, and Tech simultaneously."""
 
         all_candidates = []
         query_embedding = self.embed_model.encode(raw_text, convert_to_tensor=True)
 
-        pools_to_search = ["skill", "task", "dwa"] if entity_type == "experience" else [entity_type]
+        if entity_type == "experience":
+            pools_to_search = ["task", "dwa", "wa", "skill", "tech"]
+        else:
+            pools_to_search = [entity_type]
 
         for pool_name in pools_to_search:
             pool = self.pools.get(pool_name)
@@ -157,6 +163,8 @@ class IRMapper:
                 cursor.execute("SELECT task FROM task_statements WHERE task_id = ? LIMIT 1", (element_id,))
             elif entity_type == "dwa":
                 cursor.execute("SELECT dwa_title FROM dwa_reference WHERE dwa_id = ? LIMIT 1", (element_id,))
+            elif entity_type == "wa":
+                cursor.execute("SELECT element_name FROM work_activities WHERE element_id = ? LIMIT 1", (element_id,))
             else:
                 conn.close()
                 return "Unknown entity type"

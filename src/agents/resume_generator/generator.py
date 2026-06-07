@@ -1,5 +1,6 @@
 import json
 from workflow.state import CArcState
+from utils.utils import translate_onet_ids
 
 
 def generate_resume(state: CArcState, llm_client) -> dict:
@@ -14,7 +15,17 @@ def generate_resume(state: CArcState, llm_client) -> dict:
     last_msg = messages[-1] if messages else {}
     user_choice = (last_msg.get("content", "") if isinstance(last_msg, dict) else last_msg.content).strip()
 
-    # 3. Inject both into the reasoning prompt
+    # 3. Pre-translate O*NET IDs into human-readable text before passing to the LLM
+    translated_data = translate_onet_ids(master_profile)
+    readable_profile = {
+        "basic_info": master_profile.get("basic_info", {}),
+        "education": master_profile.get("education", []),
+        "work_experience": list(dict.fromkeys(
+            translated_data.get("tasks", []) + translated_data.get("dwas", []) + translated_data.get("work_activities", []))),
+        "skills": list(dict.fromkeys(translated_data.get("skills", []) + translated_data.get("tech_skills", [])))
+    }
+
+    # 4. Inject into the reasoning prompt without asking the LLM to translate IDs
     prompt = (
         f"You are an Expert Executive Resume Writer.\n\n"
         f"CONTEXT:\n"
@@ -22,17 +33,15 @@ def generate_resume(state: CArcState, llm_client) -> dict:
         f"The candidate selected their target career with this statement: \"{user_choice}\"\n\n"
         f"INSTRUCTIONS:\n"
         f"Step 1: Logically deduce which specific career path the candidate is choosing.\n"
-        f"Step 2: Write a highly professional, ATS-friendly resume tailored for that role.\n"
-        f"Step 3: DATA TRANSLATION: You will notice O*NET IDs (e.g., '20391' or '4.A.4.a.1.I01.D05') in the candidate's profile data. "
-        f"You MUST translate these codes into professional, human-readable English bullet points. DO NOT include the O*NET IDs in the final resume.\n\n"
+        f"Step 2: Write a highly professional, ATS-friendly resume tailored for that role.\n\n"
         f"Use ONLY the following verified candidate data. Do not invent experience or add fake placeholder companies/dates:\n"
-        f"{json.dumps(master_profile, indent=2)}\n\n"
+        f"{json.dumps(readable_profile, indent=2)}\n\n"
         f"STRICT FORMATTING RULES:\n"
-        f"1. Output ONLY the final Markdown resume. Do not include your deduction steps (e.g., 'Step 1: Logical Deduction...').\n"
+        f"1. Output ONLY the final Markdown resume. Do not include your deduction steps.\n"
         f"2. Do not include any introductory greetings or concluding notes.\n"
         f"3. Start immediately with the Candidate's Name as an H1 Header (#).\n"
         f"4. Include a Professional Summary.\n"
-        f"5. Format tasks and DWAs as professional bullet points—translate the O*NET IDs into clear action-oriented phrases."
+        f"5. Format the provided work experience into professional, action-oriented bullet points."
     )
 
     print(f"\n[➔] STARTING NODE: resume_agent | Deduce user intent: '{user_choice}'")

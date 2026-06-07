@@ -1,57 +1,5 @@
-import sqlite3
 from workflow.state import CArcState
-
-
-def translate_onet_ids(master_profile: dict, db_path: str = "../data_factory/onet.db") -> dict:
-    translated = {"tasks": [], "dwas": [], "skills": [], "tech_skills": []}
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-
-        # Use a Set to automatically handle duplicate DWA IDs
-        rolled_up_dwas = set(master_profile.get("dwas", []))
-        unlinked_tasks = []
-
-        # 1. Roll-up Tasks to DWAs
-        for t_id in master_profile.get("tasks", []):
-            try:
-                # Find the parent DWA for this specific task
-                cursor.execute("SELECT dwa_id FROM tasks_to_dwas WHERE task_id = ? LIMIT 1", (t_id,))
-                row = cursor.fetchone()
-                if row and row[0]:
-                    rolled_up_dwas.add(row[0])  # Escalate task to DWA!
-                else:
-                    unlinked_tasks.append(t_id)  # No DWA linkage, keep as granular task
-            except sqlite3.Error:
-                unlinked_tasks.append(t_id)
-
-        # 2. Translate the combined DWAs
-        for d_id in rolled_up_dwas:
-            cursor.execute("SELECT dwa_title FROM dwa_reference WHERE dwa_id = ?", (d_id,))
-            row = cursor.fetchone()
-            translated["dwas"].append(row[0] if row else str(d_id))
-
-        # 3. Translate remaining unlinked Tasks
-        for t_id in unlinked_tasks:
-            cursor.execute("SELECT task FROM task_statements WHERE task_id = ?", (t_id,))
-            row = cursor.fetchone()
-            translated["tasks"].append(row[0] if row else str(t_id))
-
-        # 4. Translate Skills
-        for s_id in master_profile.get("skills", []):
-            cursor.execute("SELECT element_name FROM skills WHERE element_id = ?", (s_id,))
-            row = cursor.fetchone()
-            translated["skills"].append(row[0] if row else str(s_id))
-        conn.close()
-
-    except Exception as e:
-        print(f"[X] Translation Error: {e}")
-        translated["tasks"] = master_profile.get("tasks", [])
-        translated["dwas"] = master_profile.get("dwas", [])
-        translated["skills"] = master_profile.get("skills", [])
-
-    translated["tech_skills"] = [str(tech).replace("TECH-", "") for tech in master_profile.get("tech_skills", [])]
-    return translated
+from utils.utils import translate_onet_ids
 
 
 def execute_mentor(state: CArcState, llm) -> dict:
@@ -189,7 +137,11 @@ def execute_mentor(state: CArcState, llm) -> dict:
         skills_display = "\n".join([f"* {s}" for s in all_skills]) if all_skills else "* None"
 
         # Combine and format DWAs and remaining Tasks as bullets (Eliminates exact string duplicates)
-        all_experience = list(dict.fromkeys(readable_data["dwas"] + readable_data["tasks"]))
+        all_experience = list(dict.fromkeys(
+            readable_data["work_activities"] +
+            readable_data["dwas"] +
+            readable_data["tasks"]
+        ))
         exp_display = "\n".join([f"* {e}" for e in all_experience]) if all_experience else "* None"
 
         # Format Education as bullets

@@ -8,37 +8,94 @@ from scipy import sparse
 
 class CareerExpert:
     def __init__(self,
-                 model_path="agents/career_expert/saved_model/career_expert_v1.json",
-                 encoder_path="agents/career_expert/saved_model/label_encoder.pkl",
+                 model_path="agents/career_expert/saved_model/career_expert_xgboost.json",
                  data_dir="agents/career_expert/processed_data"):
 
         self.model = xgb.Booster()
         self.model.load_model(model_path)
-        self.le = joblib.load(encoder_path)
+        self.le = joblib.load(data_dir + "/label_encoder.joblib")
 
-        # Load all 4 vocabulary lists
-        with open(f"{data_dir}/task_classes.json", 'r') as f: self.task_classes = json.load(f)
-        with open(f"{data_dir}/dwa_classes.json", 'r') as f: self.dwa_classes = json.load(f)
-        with open(f"{data_dir}/skill_classes.json", 'r') as f: self.skill_classes = json.load(f)
-        with open(f"{data_dir}/tech_classes.json", 'r') as f: self.tech_classes = json.load(f)
+        # Load the unified master feature blueprint
+        with open(f"{data_dir}/model_feature_columns.json", 'r') as f:
+            self.feature_columns = json.load(f)
 
-    def predict(self, user_tasks, user_dwas, user_skills, user_tech, ocean_vector):
-        # 1. Vectorize input
-        task_vec = [1 if t in user_tasks else 0 for t in self.task_classes]
-        dwa_vec = [1 if d in user_dwas else 0 for d in self.dwa_classes]
-        skill_vec = [1 if s in user_skills else 0 for s in self.skill_classes]
-        tech_vec = [1 if t in user_tech else 0 for t in self.tech_classes]
+    def predict(self, master_profile: dict, ocean_vector: dict):
 
-        # Ensure the traits are grabbed in the exact order output by pd.json_normalize
-        ocean_vec = [ocean_vector.get(t, 50.0) for t in
-                     ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism']]
+        def sanitize(val):
+            return str(val).replace('[', '').replace(']', '').replace('<', '')
 
-        # 2. Combine exactly in the order they were hstacked during training
-        input_data = np.array(task_vec + dwa_vec + skill_vec + tech_vec + ocean_vec).reshape(1, -1)
-        dmatrix = xgb.DMatrix(input_data)
-        probs = self.model.predict(dmatrix)[0]  # Array of 1,016 probabilities
+        active_features = {}
+        for k, v in ocean_vector.items():
+            active_features[sanitize(k)] = v
 
-        # 3. Get top 3 indices and their scores
+        # 1. Map flat Skills and Tech
+        for skill in master_profile.get("skills", []):
+            active_features[f"SKILL_{sanitize(skill)}"] = 1.0
+        for tech in master_profile.get("tech_skills", []):
+            sanitized_tech = sanitize(tech)
+            active_features[f"HOT_{sanitized_tech}"] = 1.0
+            active_features[f"BASE_{sanitized_tech}"] = 1.0
+
+        # 2. Reconstruct Environmental Hierarchy Paths from flat arrays
+        user_tasks = {sanitize(t) for t in master_profile.get("tasks", [])}
+        user_dwas = {sanitize(d) for d in master_profile.get("dwas", [])}
+        user_was = {sanitize(w) for w in master_profile.get("work_activities", [])}
+
+        active_was_with_children = set()
+        active_dwas_with_children = set()
+
+        # Step A: Map Tasks. Since we lack the job label, we must activate ALL valid
+        # core/supp variations of this task found in the blueprint to let XGBoost evaluate both.
+        for task in user_tasks:
+            for col in self.feature_columns:
+                if col.endswith(f"_core_{task}") or col.endswith(f"_supp_{task}"):
+                    active_features[col] = 1.0
+
+                    # Track parents to enforce mutual exclusivity (preventing orphan columns)
+                    try:
+                        parts = col.split("_DWA_")
+                        wa_id = parts[0].replace("path_WA_", "")
+                        active_was_with_children.add(wa_id)
+
+                        dwa_id = parts[1].split("_core_")[0].split("_supp_")[0]
+                        active_dwas_with_children.add(dwa_id)
+                    except IndexError:
+                        continue
+
+        # Step B: Map DWAs. Only trigger orphan status if no child tasks activated it.
+        for dwa in user_dwas:
+            for col in self.feature_columns:
+                if col.endswith(f"_DWA_{dwa}_orphan"):
+                    # If this DWA already had tasks mapped in Step A, it is NOT an orphan.
+                    if str(dwa) in active_dwas_with_children:
+                        continue
+
+                    active_features[col] = 1.0
+                    try:
+                        wa_id = col.split("_DWA_")[0].replace("path_WA_", "")
+                        active_was_with_children.add(wa_id)
+                    except IndexError:
+                        continue
+
+        # Step C: Map WAs. Only trigger orphan status if no child DWAs activated it.
+        for wa in user_was:
+            col_name = f"path_WA_{wa}_orphan"
+            if col_name in self.feature_columns:
+                if str(wa) in active_was_with_children:
+                    continue
+                active_features[col_name] = 1.0
+
+        # 3. Convert to Sparse Array exactly matching the Blueprint length
+        input_data = np.zeros((1, len(self.feature_columns)), dtype=np.float32)
+        for i, col in enumerate(self.feature_columns):
+            if col in active_features:
+                input_data[0, i] = active_features[col]
+
+        csr_input = sparse.csr_matrix(input_data)
+        dmatrix = xgb.DMatrix(csr_input)
+        probs = self.model.predict(dmatrix)[0]
+
+        # Get top 3 indices and their scores
         top_3_idx = np.argsort(probs)[-3:][::-1]
 
         results = []
@@ -71,17 +128,15 @@ class CareerExpert:
 # --- Test Execution ---
 if __name__ == "__main__":
     expert = CareerExpert(
-        model_path="./saved_model/career_expert_v1.json",
-        encoder_path="./saved_model/label_encoder.pkl",
+        model_path="./saved_model/career_expert_xgboost.json",
         data_dir="./processed_data"
     )
 
     # Example: Cold Start Profile
-    cold_start_profile = {"openness": 50, "conscientiousness": 50, "extraversion": 50, "agreeableness": 50,
-                          "neuroticism": 50}
+    cold_start_profile = {"OCEAN_O": 0.5, "OCEAN_C": 0.5, "OCEAN_E": 0.5, "OCEAN_A": 0.5, "OCEAN_N": 0.5}
 
-    # Pass empty lists for the 4 technical arrays
-    recommendations = expert.predict([], [], [], [], cold_start_profile)
+    # Pass an empty master_profile and the scaled ocean_vector
+    recommendations = expert.predict({}, cold_start_profile)
 
     print("Top 3 Career Recommendations:")
     for rec in recommendations:

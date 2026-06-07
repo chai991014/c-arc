@@ -10,6 +10,7 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
     updated_profile = {
         "tasks": list(current_profile.get("tasks", [])),
         "dwas": list(current_profile.get("dwas", [])),
+        "work_activities": list(current_profile.get("work_activities", [])),
         "skills": list(current_profile.get("skills", [])),
         "tech_skills": list(current_profile.get("tech_skills", [])),
         "basic_info": dict(current_profile.get("basic_info", {"full_name": None, "email": None, "phone": None, "location": None})),
@@ -48,7 +49,7 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
             continue
 
         # Fall back to your legacy O*NET database matching for standard skills/tasks
-        if entity_type not in ["experience", "skill", "task", "dwa"]:
+        if entity_type not in ["experience", "skill", "task", "dwa", "wa", "tech"]:
             continue
 
         grounded_data_list = ir_mapper.ground_phrase(value, entity_type)
@@ -72,11 +73,12 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
                 target_list = updated_profile["tasks"]
             elif resolved_type == "dwa":
                 target_list = updated_profile["dwas"]
+            elif resolved_type == "wa":
+                target_list = updated_profile["work_activities"]
             elif resolved_type == "skill":
-                if str(onet_code).startswith("TECH-"):
-                    target_list = updated_profile["tech_skills"]
-                else:
-                    target_list = updated_profile["skills"]
+                target_list = updated_profile["skills"]
+            elif resolved_type == "tech":
+                target_list = updated_profile["tech_skills"]
             else:
                 continue
 

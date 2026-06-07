@@ -119,6 +119,7 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
         "master_profile": {
             "tasks": [],
             "dwas": [],
+            "work_activities": [],
             "skills": [],
             "tech_skills": [],
             "basic_info": {
@@ -194,6 +195,7 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
                     "master_profile": {
                         "tasks": [],
                         "dwas": [],
+                        "work_activities": [],
                         "skills": [],
                         "tech_skills": [],
                         "basic_info": {
