@@ -143,6 +143,47 @@ class IRMapper:
 
         return final_results
 
+    def expand_relational_hierarchy(self, task_ids: list, dwa_ids: list) -> dict:
+        """Resolves Tasks -> DWAs -> WAs to enrich the profile state."""
+
+        result = {"dwas": set(dwa_ids), "was": set()}
+
+        if not task_ids and not dwa_ids:
+            return {"dwas": list(result["dwas"]), "was": list(result["was"])}
+
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+
+            # Layer 1: Resolve Task IDs -> DWA IDs (Only if tasks exist)
+            if task_ids:
+                placeholders = ",".join(["?"] * len(task_ids))
+                cursor.execute(
+                    f"SELECT DISTINCT dwa_id FROM tasks_to_dwas WHERE task_id IN ({placeholders})",
+                    task_ids
+                )
+                result["dwas"].update([row[0] for row in cursor.fetchall() if row[0]])
+
+            # Layer 2: Independent Resolution of ALL DWAs -> WA root IDs
+            dwa_list = list(result["dwas"])
+            if dwa_list:
+                placeholders = ",".join(["?"] * len(dwa_list))
+                cursor.execute(
+                    f"SELECT DISTINCT element_id FROM dwa_reference WHERE dwa_id IN ({placeholders})",
+                    dwa_list
+                )
+                result["was"].update([row[0] for row in cursor.fetchall() if row[0]])
+
+            conn.close()
+
+        except sqlite3.Error as e:
+            logger.error(f"Hierarchy database expansion failed: {e}")
+
+        return {
+            "dwas": list(result["dwas"]),
+            "was": list(result["was"])
+        }
+
     def _fetch_db_context(self, element_id: str, entity_type: str) -> str:
         """Fetches the official element name or description from the appropriate O*NET table."""
         try:

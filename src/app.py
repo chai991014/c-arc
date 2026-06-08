@@ -97,7 +97,7 @@ def run_graph(c_arc_state):
             resume_btn_update = gr.update(interactive=False, variant="success")
 
         current_profile = c_arc_state.get("profile_summary", "*Your profile summary will appear here during validation.*")
-        current_recs = c_arc_state.get("final_recommendations", "*Your XGBoost career matches will appear here.*")
+        current_recs = c_arc_state.get("final_recommendations", "*Your career matches will appear here.*")
         current_resume = c_arc_state.get("resume_content", "*Your tailored resume will appear here after generation.*")
 
         return c_arc_state["messages"], c_arc_state, c_arc_state, button_update, resume_btn_update, current_profile, current_recs, current_resume
@@ -139,6 +139,9 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
         "missing_demographics": [],
         "weak_ocean_traits": [],
         "ir_last_extracted_index": 0,
+        "profile_summary": "*Your profile summary will appear here during validation.*",
+        "target_career": "*Your career matches will appear here.*",
+        "resume_content": "*Your tailored resume will appear here after generation.*"
     })
 
     with gr.Row():
@@ -160,7 +163,7 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
                 with gr.Tab("📋 Profile Summary"):
                     profile_display = gr.Markdown(value="*Your profile summary will appear here during validation.*")
                 with gr.Tab("🎯 Career Matches"):
-                    recommendations_display = gr.Markdown(value="*Your XGBoost career matches will appear here.*")
+                    recommendations_display = gr.Markdown(value="*Your career matches will appear here.*")
                 with gr.Tab("📄 Tailored Resume"):
                     resume_display = gr.Markdown(value="*Your tailored resume will appear here after generation.*")
 
@@ -215,13 +218,19 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft()) as demo:
                     "missing_demographics": [],
                     "weak_ocean_traits": [],
                     "ir_last_extracted_index": 0,
+                    "profile_summary": "*Your profile summary will appear here during validation.*",
+                    "target_career": "*Your career matches will appear here.*",
+                    "resume_content": "*Your tailored resume will appear here after generation.*"
                 }
-                return fresh_state["messages"], fresh_state, fresh_state
+                return fresh_state["messages"], fresh_state, fresh_state, fresh_state.get("profile_summary", ""), fresh_state.get("final_recommendations", ""), fresh_state.get("resume_content", "")
 
 
-            clear_btn.click(reset_state, inputs=[], outputs=[chatbot, initial_state, state_display])
+    clear_btn.click(
+        reset_state,
+        inputs=[],
+        outputs=[chatbot, initial_state, state_display, profile_display, recommendations_display, resume_display]
+    )
 
-    # Wire up the text box
     msg.submit(
         add_user_message,
         inputs=[msg, initial_state],

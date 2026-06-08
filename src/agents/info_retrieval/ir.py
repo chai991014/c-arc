@@ -88,7 +88,18 @@ def execute_ir(state: CArcState, ir_extractor, ir_mapper) -> dict:
             elif intent == "DELETE" and onet_code in target_list:
                 target_list.remove(onet_code)
 
-    # Cleanly return the reconciled state
+    # Perform Relational Expansion ---
+    print("\n[+] Expanding relational hierarchy (Tasks -> DWAs -> WAs)...")
+    expanded_data = ir_mapper.expand_relational_hierarchy(
+        updated_profile["tasks"],
+        updated_profile["dwas"]
+    )
+
+    # Merge the expanded data back in, using sets to guarantee no duplicates
+    updated_profile["dwas"] = list(set(updated_profile["dwas"] + expanded_data["dwas"]))
+    updated_profile["work_activities"] = list(set(updated_profile["work_activities"] + expanded_data["was"]))
+
+    # Cleanly return the reconciled and expanded state
     print(f"\n[+] DEBUG - Master Profile Updated: {updated_profile}")
     return {
         "master_profile": updated_profile,
