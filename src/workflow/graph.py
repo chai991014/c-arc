@@ -1,6 +1,6 @@
 from langgraph.graph import StateGraph, END
-from .state import CArcState
-from .nodes import mentor_node, profiler_node, ir_node, career_expert_node, evaluator_node, resume_generator_node
+from workflow.state import CArcState
+from workflow.nodes import mentor_node, profiler_node, ir_node, career_expert_node, evaluator_node, resume_generator_node
 
 IR_TURN = 2
 PROFILER_TURN = 2
@@ -18,7 +18,7 @@ def dispatch_workers(state: CArcState) -> str:
 
     if state.get("mentor_mode") == "validation":
         if state.get("profile_verified") is True:
-            print("    -> Permission confirmed. Moving to XGBoost Inference Engine.")
+            print("    -> Permission confirmed. Moving to Career Expert Inference Engine.")
             return "career_expert"
         else:
             print("    -> Enter validation loop.")

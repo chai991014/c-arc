@@ -9,10 +9,11 @@ def execute_career_expert(state: CArcState, expert_engine) -> dict:
 
     try:
         # Pass the full master_profile and normalized OCEAN vector directly
-        predictions = expert_engine.predict(master_profile, formatted_ocean)
+        knn_pred, predictions = expert_engine.predict(master_profile, formatted_ocean)
 
     except Exception as e:
         print(f"[X] Career Expert Inference crashed: {e}")
+        knn_pred = []
         predictions = []
 
     # 4. Format the output for the LLM Counselor
@@ -21,8 +22,8 @@ def execute_career_expert(state: CArcState, expert_engine) -> dict:
         print("    -> Inference failed to generate predictions.")
     else:
         rec_details = []
-        # Return top 5 out of the 15 retrieved by KNN
-        for i, p in enumerate(predictions[:5]):
+        # Return top 10 out of the 30 retrieved by KNN
+        for i, p in enumerate(predictions[:10]):
             soc = p['soc_code']
             score = p['match_score']
             title = p['job_title']
@@ -40,7 +41,30 @@ def execute_career_expert(state: CArcState, expert_engine) -> dict:
         print(f"    -> Recommendations:")
         print(formatted_recs)
 
+        knn_rec = []
+        final_rec = []
+        knn_rec.append("| Rank | Cosine Distance | SOC Code | Job |")
+        knn_rec.append("| :--- | :--- | :--- | :--- |")
+        final_rec.append("| Rank | Match Score | SOC Code | Job |")
+        final_rec.append("| :--- | :--- | :--- | :--- |")
+        for i, p in enumerate(knn_pred):
+            soc = p['soc_code']
+            title = p['job_title']
+            score = p['knn_dist']
+            knn_rec.append(f"| {i + 1:02d} | {score:.4f} | {soc} | {title} |")
+
+        for i, p in enumerate(predictions):
+            soc = p['soc_code']
+            title = p['job_title']
+            score = p['match_score']
+            final_rec.append(f"| {i + 1:02d} | {score:.4f} | {soc} | {title} |")
+
+        formatted_knn_rec = "\n".join(knn_rec)
+        formatted_final_rec = "\n".join(final_rec)
+
     return {
         "mentor_mode": "counselor",
-        "final_recommendations": formatted_recs
+        "final_recommendations": formatted_recs,
+        "knn_rec": formatted_knn_rec,
+        "final_rec": formatted_final_rec
     }

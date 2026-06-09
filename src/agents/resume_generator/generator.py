@@ -8,7 +8,7 @@ def generate_resume(state: CArcState, llm_client) -> dict:
     messages = state.get("messages", [])
     master_profile = state.get("master_profile", {})
 
-    # 1. Pull the XGBoost recommendations that the user is referencing
+    # 1. Pull the career expert recommendations that the user is referencing
     recommendations = state.get("final_recommendations", "No specific recommendations found.")
 
     # 2. Capture the user's vague or specific selection (e.g., "the first one")

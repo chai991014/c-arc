@@ -45,7 +45,6 @@ class CareerExpert:
         self.model.eval()
 
         # 4. Build Job Meta Lookup (For Title and Job OCEAN scores)
-        # We need the benchmark OCEAN scores to concatenate into the XGBoost row
         df_bench = pd.read_csv(BENCHMARK_DIR)
         self.job_meta = {}
         for _, row in df_bench.iterrows():
@@ -115,6 +114,7 @@ class CareerExpert:
         # 3. Stage 2: Cross-Encoder Construction
         inference_rows = []
         candidate_socs = []
+        knn_results = []
 
         print("\n🔮 STAGE 1 RETRIEVAL (KNN):")
         for rank, (idx, knn_dist) in enumerate(zip(top_indices, top_distances)):
@@ -122,6 +122,11 @@ class CareerExpert:
             cand_job_sparse = self.benchmark_matrix[idx]
             cand_job_ocean = self.job_meta[soc]['ocean']
             job_title = self.job_meta[soc]['title']
+            knn_results.append({
+                "soc_code": soc,
+                "job_title": job_title,
+                "knn_dist": round(knn_dist, 4)
+            })
 
             print(f"  Rank {rank + 1:02d} | Cosine Dist: {knn_dist:.4f} | SOC: {soc} | Job: {job_title}")
 
@@ -175,7 +180,7 @@ class CareerExpert:
             print(
                 f"  Rank {rank + 1:02d} | Match Score: {res['match_score']:6.2f}% | SOC: {res['soc_code']} | Job: {res['job_title']}")
 
-        return results
+        return knn_results, results
 
     def get_soc_details(self, soc_code: str, db_path: str = "../data_factory/onet.db") -> dict:
         """Fetches the official job title and description from the O*NET database."""

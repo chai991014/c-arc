@@ -77,14 +77,14 @@ def execute_mentor(state: CArcState, llm) -> dict:
 
     elif mode == "counselor":
         system_prompt = (
-            "You are the C-Arc Career Counselor, an expert, empathetic, and practical career mentor.\n"
+            "You are the C-Arc Career Counselor, an empathetic, insightful, and highly conversational career mentor.\n"
             "Phase 1 (Discovery) is complete. You are now in Phase 2 (Counseling) helping the candidate navigate their ML-generated career matches.\n\n"
             "CORE DIRECTIVES:\n"
-            "1. THE BOUNDARY: You MUST ground every piece of advice, skill gap analysis, and mock interview question STRICTLY in the candidate's specific XGBoost career matches. Never suggest alternative career paths.\n"
-            "2. THE PERSONA: Speak like a real human mentor in a chat app. Be warm, encouraging, and direct.\n"
-            "3. THE FORMAT: Keep responses highly concise and conversational (2-4 short sentences). Avoid robotic AI transitions, bulleted lists, or long essays unless the user explicitly asks for detailed formatting.\n"
-            "4. THE GOAL: Answer the user's immediate question, then help them take actionable steps (e.g., preparing for the resume generator, interview prep) for their chosen path.\n\n"
-            "Never output your internal thinking process. Output ONLY your direct dialogue."
+            "1. THE PERSONA (DEFAULT MODE): Act like a real human chatting in a messaging app. Your default responses MUST be short, warm, and conversational (1-3 sentences maximum). Do not use bullet points or long paragraphs. Always end with a single, gentle question to keep the dialogue moving.\n"
+            "2. THE EMPATHY MODE (HANDLING DOUBT): If the user expresses self-doubt, anxiety, or feels overwhelmed, temporarily stop explaining data. Prioritize emotional reassurance. Validate their feelings, calm them down, and gently build their confidence by reminding them of their proven capabilities. Be highly supportive and human.\n"
+            "3. THE EXPLANATION MODE (ONLY WHEN ASKED): IF and ONLY IF the user explicitly asks 'why' they fit a role or requests a detailed explanation, you may provide a deeper analysis. Use a brief intro, 2-3 concise bullet points mapping their specific extracted skills and past experiences to the role, and a closing question.\n"
+            "4. THE BOUNDARY: Ground every piece of advice and explanation STRICTLY in the candidate's specific XGBoost career matches and their extracted profile data. Do not invent or assume skills they have not provided.\n\n"
+            "FORMATTING RULE: You must respond ONLY with the direct dialogue intended for the user. Begin your response immediately with your conversational reply."
         )
 
         # Safely extract the content of the very last message in the conversation
@@ -97,17 +97,35 @@ def execute_mentor(state: CArcState, llm) -> dict:
         if final_recs and "Profile Confirmed by User" in last_msg_content:
             user_prompt = (
                 f"Conversation History:\n{chat_history}\n\n"
-                f"Our XGBoost ML model generated these top career matches:\n{final_recs}\n\n"
+                f"Our ML model generated these top career matches:\n{final_recs}\n\n"
                 f"This is the big reveal! Congratulate the candidate on completing the profiling phase, gracefully present their top career matches (including scores), and ask them which path catches their eye."
             )
         # Ongoing Counseling: Dynamic Follow-ups
         else:
+            readable_data = translate_onet_ids(master_profile)
+
+            # Combine and format skills as bullets (Eliminates exact string duplicates)
+            all_skills = list(dict.fromkeys(readable_data["skills"] + readable_data["tech_skills"]))
+            extracted_skills = ", ".join([f"{s}" for s in all_skills]) if all_skills else "None"
+
+            # Combine and format DWAs and remaining Tasks as bullets (Eliminates exact string duplicates)
+            all_experience = list(dict.fromkeys(
+                readable_data["work_activities"] +
+                readable_data["dwas"] +
+                readable_data["tasks"]
+            ))
+            extracted_exp = ", ".join([f"{e}" for e in all_experience]) if all_experience else "None"
+
             user_prompt = (
                 f"[SYSTEM CONTEXT - DO NOT READ THIS TO THE USER]\n"
-                f"Candidate's Official XGBoost Career Matches:\n{final_recs}\n"
+                f"Candidate's Official Career Matches:\n{final_recs}\n\n"
+                f"Candidate's Extracted Profile Data (Use this to explain WHY they fit a role):\n"
+                f"- Candidate OCEAN personality score: {ocean}"
+                f"- Skills: {extracted_skills}"
+                f"- Experience: {extracted_exp}"
                 f"--------------------------------------------------\n\n"
                 f"Conversation History:\n{chat_history}\n\n"
-                f"Respond directly to the candidate's last message. Keep the conversation flowing naturally while strictly anchoring your advice to the career matches above."
+                f"Respond directly to the candidate's last message. If they ask for an explanation of a role fit, provide a scannable, bulleted analysis mapping their specific extracted data to that role."
             )
 
     response = llm.generate(
@@ -127,6 +145,12 @@ def execute_mentor(state: CArcState, llm) -> dict:
         else:
             # Fallback if no double newline exists: try to split at the last known header
             response = response.split("Construct the Response:")[-1].strip()
+
+    # Fallback to strip out "thought" blocks if Gemma hallucinates one
+    if response.lower().startswith("thought"):
+        # Split by double newline and grab the last block, which is usually the actual response
+        parts = response.split("\n\n")
+        response = parts[-1].strip() if len(parts) > 1 else response
 
     # Format the Document Panel summary (only during validation)
     if mode == "validation":
