@@ -143,7 +143,7 @@ def generate_ocean_plot(ocean_history):
 def add_user_message(user_input, c_arc_state):
     """Captures user input, builds context prompt, and updates UI instantly."""
     if not user_input.strip():
-        return c_arc_state.get("messages", []), c_arc_state, ""
+        return c_arc_state.get("messages", []), c_arc_state, gr.update(), gr.update(), gr.update()
 
     # Update state with user message
     c_arc_state["messages"].append({"role": "user", "content": user_input})
@@ -152,7 +152,7 @@ def add_user_message(user_input, c_arc_state):
     c_arc_state["turn_count"] += 1
 
     # Return immediately to update the chatbox and clear the text input
-    return c_arc_state["messages"], c_arc_state, ""
+    return c_arc_state["messages"], c_arc_state, gr.update(value="", interactive=False), gr.update(interactive=False), gr.update(interactive=False)
 
 
 def handle_profile_confirmation(c_arc_state):
@@ -190,7 +190,8 @@ def run_graph(c_arc_state):
                 c_arc_state.get("knn_rec", ""), c_arc_state.get("final_rec", ""),
                 c_arc_state.get("profile_summary", "*Your profile summary will appear here during validation.*"),
                 c_arc_state.get("final_recommendations", "*Your career matches will appear here.*"),
-                c_arc_state.get("resume_content", "*Your tailored resume will appear here after generation.*"))
+                c_arc_state.get("resume_content", "*Your tailored resume will appear here after generation.*"),
+                gr.update(interactive=True), gr.update(interactive=True), gr.update(interactive=True))
 
     config = {"recursion_limit": 15}
 
@@ -233,7 +234,8 @@ def run_graph(c_arc_state):
 
         return (c_arc_state["messages"], c_arc_state, dashboard_view, ocean_plot, button_update, resume_btn_update,
                 current_knn_rec, current_final_rec,
-                current_profile, current_recs, current_resume)
+                current_profile, current_recs, current_resume,
+                gr.update(interactive=True), gr.update(interactive=True), gr.update(interactive=True))
 
     except Exception as e:
         import traceback
@@ -243,7 +245,8 @@ def run_graph(c_arc_state):
         ocean_plot = generate_ocean_plot(c_arc_state.get("ocean_history", []))
         return (c_arc_state["messages"], c_arc_state, dashboard_view, ocean_plot, gr.update(interactive=False), gr.update(interactive=False),
                 c_arc_state.get("knn_rec", ""), c_arc_state.get("final_rec", ""),
-                c_arc_state.get("profile_summary", ""), c_arc_state.get("final_recommendations", ""), c_arc_state.get("resume_content", ""))
+                c_arc_state.get("profile_summary", ""), c_arc_state.get("final_recommendations", ""), c_arc_state.get("resume_content", ""),
+                gr.update(interactive=True), gr.update(interactive=True), gr.update(interactive=True))
 
 # Define the Gradio Interface
 with gr.Blocks(title="C-Arc", theme=gr.themes.Soft(), css=".markdown-text { font-size: 18px; }") as demo:
@@ -388,13 +391,14 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft(), css=".markdown-text { font
     msg.submit(
         add_user_message,
         inputs=[msg, initial_state],
-        outputs=[chatbot, initial_state, msg]
+        outputs=[chatbot, initial_state, msg, submit_btn, clear_btn]
     ).then(
         run_graph,
         inputs=[initial_state],
         outputs=[chatbot, initial_state, state_display, ocean_plot_display, confirm_profile_btn, generate_resume_btn,
                  knn_rec_display, final_rec_display,
-                 profile_display, recommendations_display, resume_display]
+                 profile_display, recommendations_display, resume_display,
+                 msg, submit_btn, clear_btn]
     )
 
     submit_btn.click(
@@ -406,7 +410,8 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft(), css=".markdown-text { font
         inputs=[initial_state],
         outputs=[chatbot, initial_state, state_display, ocean_plot_display, confirm_profile_btn, generate_resume_btn,
                  knn_rec_display, final_rec_display,
-                 profile_display, recommendations_display, resume_display]
+                 profile_display, recommendations_display, resume_display,
+                 msg, submit_btn, clear_btn]
     )
 
     confirm_profile_btn.click(
@@ -418,7 +423,8 @@ with gr.Blocks(title="C-Arc", theme=gr.themes.Soft(), css=".markdown-text { font
         inputs=[initial_state],
         outputs=[chatbot, initial_state, state_display, ocean_plot_display, confirm_profile_btn, generate_resume_btn,
                  knn_rec_display, final_rec_display,
-                 profile_display, recommendations_display, resume_display]
+                 profile_display, recommendations_display, resume_display,
+                 msg, submit_btn, clear_btn]
     )
 
     generate_resume_btn.click(
