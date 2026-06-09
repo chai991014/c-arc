@@ -26,6 +26,7 @@ def audit_entity_density(master_profile: dict, min_entities: int = 5) -> bool:
     total_density = (
             len(master_profile.get("tasks", [])) +
             len(master_profile.get("dwas", [])) +
+            len(master_profile.get("work_activities", [])) +
             len(master_profile.get("skills", [])) +
             len(master_profile.get("tech_skills", []))
     )

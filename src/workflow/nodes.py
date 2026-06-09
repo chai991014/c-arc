@@ -55,7 +55,7 @@ def ir_node(state: CArcState) -> dict:
 
 def career_expert_node(state: CArcState) -> dict:
     """Pure XGBoost inference. Formats data and triggers Phase 2 Mentor Mode."""
-    print(f"\n[➔] STARTING NODE: career_expert_node (XGBoost Only)")
+    print(f"\n[➔] STARTING NODE: career_expert_node")
     return execute_career_expert(state, expert_engine)
 
 
